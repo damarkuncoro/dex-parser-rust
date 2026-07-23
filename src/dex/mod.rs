@@ -1,12 +1,14 @@
+//! Core DEX parsing and data models.
+
+pub mod constants;
+pub mod context;
+pub mod display;
+pub mod error;
+pub mod instructions;
 pub mod models;
 pub mod parsers;
-pub mod instructions;
-pub mod context;
 pub mod utils;
-pub mod error;
-pub mod constants;
-pub mod display;
 
+pub use error::DexError;
 pub use models::Dex;
 pub use parsers::DexParser;
-pub use error::DexError;

@@ -2,6 +2,13 @@
 name = "dex-parser-rust"
 version = "0.1.0"
 edition = "2021"
+authors = ["Damar Kuncoro <damarkuncoro@gmail.com>"]
+description = "A high-performance, modular, and parallel Android DEX file parser"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/damarkuncoro/dex-parser-rust"
+readme = "README.md"
+keywords = ["android", "dex", "parser", "reverse-engineering", "parallel"]
+categories = ["parser-implementations", "development-tools"]
 
 [dependencies]
 scroll = { version = "0.11.0", features = ["derive"] }

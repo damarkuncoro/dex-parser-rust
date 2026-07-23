@@ -1,12 +1,17 @@
-use scroll::{Pread, Endian};
+use crate::dex::constants::sizes::STRING_ID_ITEM;
 use crate::dex::error::DexError;
 use crate::dex::utils::read_uleb128;
-use crate::dex::constants::sizes::STRING_ID_ITEM;
+use scroll::{Endian, Pread};
 
 pub struct StringSection;
 
 impl StringSection {
-    pub fn parse(buffer: &[u8], header_string_ids_size: u32, header_string_ids_off: u32, endian: Endian) -> Result<Vec<String>, DexError> {
+    pub fn parse(
+        buffer: &[u8],
+        header_string_ids_size: u32,
+        header_string_ids_off: u32,
+        endian: Endian,
+    ) -> Result<Vec<String>, DexError> {
         let size = header_string_ids_size as usize;
         let offset = header_string_ids_off as usize;
 
@@ -29,6 +34,16 @@ impl StringSection {
     }
 }
 
-pub fn parse(buffer: &[u8], header_string_ids_size: u32, header_string_ids_off: u32, endian: Endian) -> Result<Vec<String>, DexError> {
-    StringSection::parse(buffer, header_string_ids_size, header_string_ids_off, endian)
+pub fn parse(
+    buffer: &[u8],
+    header_string_ids_size: u32,
+    header_string_ids_off: u32,
+    endian: Endian,
+) -> Result<Vec<String>, DexError> {
+    StringSection::parse(
+        buffer,
+        header_string_ids_size,
+        header_string_ids_off,
+        endian,
+    )
 }

@@ -1,6 +1,8 @@
 use crate::dex::models::header::RawHeader;
 use crate::dex::models::{Field, Proto};
-use crate::dex::parsers::traits::{StringResolver, TypeResolver, MethodResolver, FieldResolver, DexResolver};
+use crate::dex::parsers::traits::{
+    DexResolver, FieldResolver, MethodResolver, StringResolver, TypeResolver,
+};
 use scroll::Endian;
 
 pub struct DexContext<'a> {

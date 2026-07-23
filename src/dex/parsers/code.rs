@@ -1,16 +1,16 @@
-use scroll::{Pread, Endian};
-use crate::dex::error::DexError;
-use crate::dex::models::{Code, CatchHandler, TryHandler, raw::RawCodeItem};
-use crate::dex::instructions::decoder::InstructionDecoder;
 use crate::dex::constants::sizes::CODE_ITEM_HEADER;
-use crate::dex::utils::{read_uleb128, read_sleb128};
+use crate::dex::error::DexError;
+use crate::dex::instructions::decoder::InstructionDecoder;
+use crate::dex::models::{raw::RawCodeItem, CatchHandler, Code, TryHandler};
 use crate::dex::parsers::traits::DexResolver;
+use crate::dex::utils::{read_sleb128, read_uleb128};
+use scroll::{Endian, Pread};
 
 pub fn parse<R: DexResolver>(
     buffer: &[u8],
     offset: usize,
     resolver: &R,
-    endian: Endian
+    endian: Endian,
 ) -> Result<Code, DexError> {
     let mut curr = offset;
     let raw: RawCodeItem = buffer.pread_with(curr, endian)?;
@@ -28,7 +28,14 @@ pub fn parse<R: DexResolver>(
         pc += length;
     }
 
-    let catches = parse_catches(buffer, insns_end, raw.insns_size, raw.tries_size, resolver, endian)?;
+    let catches = parse_catches(
+        buffer,
+        insns_end,
+        raw.insns_size,
+        raw.tries_size,
+        resolver,
+        endian,
+    )?;
 
     Ok(Code {
         registers_size: raw.registers_size,
@@ -46,12 +53,12 @@ fn parse_catches<R: DexResolver>(
     insns_size: u32,
     tries_size: u16,
     resolver: &R,
-    endian: Endian
+    endian: Endian,
 ) -> Result<Vec<CatchHandler>, DexError> {
     let mut catches = Vec::new();
     if tries_size > 0 {
         let mut try_offset = insns_end;
-        if (insns_size % 2) != 0 {
+        if !insns_size.is_multiple_of(2) {
             try_offset += 2;
         }
 
@@ -68,11 +75,13 @@ fn parse_catches<R: DexResolver>(
             h_curr += b;
 
             let mut handlers = Vec::new();
-            let abs_size = size.abs() as usize;
+            let abs_size = size.unsigned_abs() as usize;
 
             for _ in 0..abs_size {
-                let (type_idx, b1) = read_uleb128(buffer, h_curr); h_curr += b1;
-                let (addr, b2) = read_uleb128(buffer, h_curr); h_curr += b2;
+                let (type_idx, b1) = read_uleb128(buffer, h_curr);
+                h_curr += b1;
+                let (addr, b2) = read_uleb128(buffer, h_curr);
+                h_curr += b2;
                 handlers.push(TryHandler {
                     type_name: resolver.resolve_type(type_idx as u32).unwrap_or_default(),
                     addr: addr as u32,

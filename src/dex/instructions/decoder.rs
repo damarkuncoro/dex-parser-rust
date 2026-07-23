@@ -1,25 +1,40 @@
-use scroll::{Pread, Endian};
+use crate::dex::instructions::opcodes::{IndexType, OpcodeTable};
 use crate::dex::models::Instruction;
-use crate::dex::instructions::opcodes::{OpcodeTable, IndexType};
 use crate::dex::parsers::traits::DexResolver;
+use scroll::{Endian, Pread};
 
+/// Decodes raw Dalvik bytecode into high-level `Instruction` structures.
+///
+/// It uses a `DexResolver` to resolve constant pool indexes (strings, types, methods, fields)
+/// into human-readable strings during the decoding process.
 pub struct InstructionDecoder<'a, R: DexResolver> {
     resolver: &'a R,
 }
 
 impl<'a, R: DexResolver> InstructionDecoder<'a, R> {
+    /// Creates a new decoder with the given resolver.
     pub fn new(resolver: &'a R) -> Self {
         Self { resolver }
     }
 
-    pub fn decode(&self, buffer: &[u8], pc: usize, curr: usize, endian: Endian) -> (Instruction, usize) {
+    /// Decodes a single instruction at the given program counter (pc).
+    ///
+    /// Returns the decoded `Instruction` and the number of bytes consumed.
+    pub fn decode(
+        &self,
+        buffer: &[u8],
+        pc: usize,
+        curr: usize,
+        endian: Endian,
+    ) -> (Instruction, usize) {
         let opcode_byte: u8 = buffer.pread_with(pc, endian).unwrap_or(0);
         let info = OpcodeTable::get(opcode_byte);
 
         let mut description = info.format.clone();
 
         if info.index_type != IndexType::None {
-            let index: u32 = if opcode_byte == 0x1b { // const-string/jumbo
+            let index: u32 = if opcode_byte == 0x1b {
+                // const-string/jumbo
                 buffer.pread_with(pc + 2, endian).unwrap_or(0)
             } else {
                 let idx16: u16 = buffer.pread_with(pc + 2, endian).unwrap_or(0);
@@ -27,24 +42,24 @@ impl<'a, R: DexResolver> InstructionDecoder<'a, R> {
             };
 
             let resolved = match info.index_type {
-                IndexType::String => {
-                    self.resolver.resolve_string(index)
-                        .map(|s| format!("\"{}\"", s))
-                        .unwrap_or_else(|| format!("string@{:04x}", index))
-                },
-                IndexType::Type => {
-                    self.resolver.resolve_type(index)
-                        .unwrap_or_else(|| format!("type@{:04x}", index))
-                },
-                IndexType::Method => {
-                    self.resolver.resolve_method(index)
-                        .unwrap_or_else(|| format!("meth@{:04x}", index))
-                },
-                IndexType::Field => {
-                    self.resolver.resolve_field(index)
-                        .map(|f| format!("{}->{}:{}", f.class, f.name, f.type_name))
-                        .unwrap_or_else(|| format!("field@{:04x}", index))
-                },
+                IndexType::String => self
+                    .resolver
+                    .resolve_string(index)
+                    .map(|s| format!("\"{}\"", s))
+                    .unwrap_or_else(|| format!("string@{:04x}", index)),
+                IndexType::Type => self
+                    .resolver
+                    .resolve_type(index)
+                    .unwrap_or_else(|| format!("type@{:04x}", index)),
+                IndexType::Method => self
+                    .resolver
+                    .resolve_method(index)
+                    .unwrap_or_else(|| format!("meth@{:04x}", index)),
+                IndexType::Field => self
+                    .resolver
+                    .resolve_field(index)
+                    .map(|f| format!("{}->{}:{}", f.class, f.name, f.type_name))
+                    .unwrap_or_else(|| format!("field@{:04x}", index)),
                 IndexType::None => String::new(),
             };
             description = format!("{}{}", info.format, resolved);
@@ -70,17 +85,29 @@ mod tests {
     struct MockResolver;
     impl StringResolver for MockResolver {
         fn resolve_string(&self, idx: u32) -> Option<String> {
-            if idx == 1 { Some("HelloRust".to_string()) } else { None }
+            if idx == 1 {
+                Some("HelloRust".to_string())
+            } else {
+                None
+            }
         }
     }
     impl TypeResolver for MockResolver {
         fn resolve_type(&self, idx: u32) -> Option<String> {
-            if idx == 2 { Some("Ljava/lang/String;".to_string()) } else { None }
+            if idx == 2 {
+                Some("Ljava/lang/String;".to_string())
+            } else {
+                None
+            }
         }
     }
     impl MethodResolver for MockResolver {
         fn resolve_method(&self, idx: u32) -> Option<String> {
-            if idx == 3 { Some("Ljava/io/PrintStream;->println".to_string()) } else { None }
+            if idx == 3 {
+                Some("Ljava/io/PrintStream;->println".to_string())
+            } else {
+                None
+            }
         }
     }
     impl FieldResolver for MockResolver {
@@ -91,7 +118,9 @@ mod tests {
                     name: "out".to_string(),
                     type_name: "Ljava/io/PrintStream;".to_string(),
                 })
-            } else { None }
+            } else {
+                None
+            }
         }
     }
     impl DexResolver for MockResolver {}
@@ -116,7 +145,8 @@ mod tests {
         let (ins, _) = decoder.decode(&buffer, 0, 0, Endian::Little);
 
         assert_eq!(ins.name, "sget");
-        assert!(ins.description.contains("Ljava/lang/System;->out:Ljava/io/PrintStream;"));
+        assert!(ins
+            .description
+            .contains("Ljava/lang/System;->out:Ljava/io/PrintStream;"));
     }
 }
-

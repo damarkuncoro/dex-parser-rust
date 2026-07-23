@@ -15,7 +15,9 @@ pub fn read_uleb128(buffer: &[u8], mut offset: usize) -> (u64, usize) {
     let mut count = 0;
     let mut shift = 0;
     loop {
-        if offset >= buffer.len() { break; }
+        if offset >= buffer.len() {
+            break;
+        }
         let byte = buffer[offset];
         offset += 1;
         count += 1;

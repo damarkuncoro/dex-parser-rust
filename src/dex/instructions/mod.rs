@@ -1,5 +1,5 @@
-pub mod opcodes;
 pub mod decoder;
+pub mod opcodes;
 
-pub use opcodes::{OpcodeInfo, IndexType};
 pub use decoder::InstructionDecoder;
+pub use opcodes::{IndexType, OpcodeInfo};

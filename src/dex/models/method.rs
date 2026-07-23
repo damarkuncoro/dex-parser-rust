@@ -1,6 +1,6 @@
+use super::class::Code;
 use scroll::Pread;
 use serde::Serialize;
-use super::class::Code;
 
 #[derive(Debug, Pread, Serialize)]
 pub struct RawMethodId {

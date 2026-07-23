@@ -1,5 +1,5 @@
-use crate::dex::models::Dex;
 use super::DexPrinter;
+use crate::dex::models::Dex;
 
 pub struct JsonPrinter;
 

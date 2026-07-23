@@ -1,6 +1,6 @@
+use super::method::EncodedMethod;
 use scroll::Pread;
 use serde::Serialize;
-use super::method::EncodedMethod;
 
 #[derive(Debug, Pread, Serialize)]
 pub struct RawClassDef {

@@ -68,7 +68,12 @@ impl OpcodeTable {
             0x70 => ("invoke-direct", "{vC..vG}, meth@", 3, IndexType::Method),
             0x71 => ("invoke-static", "{vC..vG}, meth@", 3, IndexType::Method),
             0x72 => ("invoke-interface", "{vC..vG}, meth@", 3, IndexType::Method),
-            0x74 => ("invoke-virtual/range", "{vCCCC..vNNNN}, meth@", 3, IndexType::Method),
+            0x74 => (
+                "invoke-virtual/range",
+                "{vCCCC..vNNNN}, meth@",
+                3,
+                IndexType::Method,
+            ),
 
             0x90 => ("add-int", "vAA, vBB, vCC", 2, IndexType::None),
             0xd0 => ("add-int/2addr", "vA, vB", 1, IndexType::None),

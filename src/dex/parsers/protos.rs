@@ -1,11 +1,17 @@
-use scroll::{Pread, Endian};
+use crate::dex::constants::sizes::PROTO_ID_ITEM;
 use crate::dex::error::DexError;
 use crate::dex::models::header::RawHeader;
-use crate::dex::models::raw::RawProtoId;
 use crate::dex::models::proto::Proto;
-use crate::dex::constants::sizes::PROTO_ID_ITEM;
+use crate::dex::models::raw::RawProtoId;
+use scroll::{Endian, Pread};
 
-pub fn parse(buffer: &[u8], header: &RawHeader, strings: &[String], types: &[String], endian: Endian) -> Result<Vec<Proto>, DexError> {
+pub fn parse(
+    buffer: &[u8],
+    header: &RawHeader,
+    strings: &[String],
+    types: &[String],
+    endian: Endian,
+) -> Result<Vec<Proto>, DexError> {
     let mut protos = Vec::with_capacity(header.proto_ids_size as usize);
     for i in 0..header.proto_ids_size {
         let off = (header.proto_ids_off as usize) + (i as usize * PROTO_ID_ITEM);
@@ -24,8 +30,14 @@ pub fn parse(buffer: &[u8], header: &RawHeader, strings: &[String], types: &[Str
         }
 
         protos.push(Proto {
-            shorty: strings.get(raw.shorty_idx as usize).cloned().unwrap_or_default(),
-            return_type: types.get(raw.return_type_idx as usize).cloned().unwrap_or_default(),
+            shorty: strings
+                .get(raw.shorty_idx as usize)
+                .cloned()
+                .unwrap_or_default(),
+            return_type: types
+                .get(raw.return_type_idx as usize)
+                .cloned()
+                .unwrap_or_default(),
             parameters,
         });
     }

@@ -1,10 +1,13 @@
 mod cli;
 
+use crate::cli::{Cli, OutputFormat};
+use clap::Parser;
+use dex_parser_rust::dex::{
+    display::{json::JsonPrinter, text::DexDumpPrinter, DexPrinter},
+    DexParser,
+};
 use std::fs::File;
 use std::io::Read;
-use clap::Parser;
-use dex_parser_rust::dex::{DexParser, display::{DexPrinter, text::DexDumpPrinter, json::JsonPrinter}};
-use crate::cli::{Cli, OutputFormat};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
