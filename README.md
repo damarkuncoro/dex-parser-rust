@@ -38,6 +38,11 @@ cargo run -- path/to/classes.dex --format json
 cargo run -- --help
 ```
 
+## Documentation
+
+Comprehensive documentation is available in the [docs/](./docs) directory:
+- [Software Architecture Description (ISO 42010)](./docs/ARCHITECTURE.md)
+
 ## Architecture
 
 The project is divided into several clear modules:
