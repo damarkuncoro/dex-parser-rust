@@ -1,62 +1,69 @@
-# Software Architecture Document (SAD) - DEX Parser Rust
+# Software Architecture Description (SAD) - ISO/IEC/IEEE 42010:2011 Compliant
 
 ## 1. Introduction
-Dokumen ini menjelaskan arsitektur tingkat tinggi dari `dex-parser-rust`, sebuah engine parser file Android DEX (Dalvik Executable) yang fokus pada performa tinggi, modularitas, dan keamanan memori menggunakan bahasa Rust.
+This document provides a formal architecture description for `dex-parser-rust`, a high-performance Android DEX file parsing engine. It is structured according to the ISO/IEC/IEEE 42010:2011 standard for architecture descriptions.
 
-## 2. Architectural Goals
-- **High Performance**: Memanfaatkan pemrosesan paralel untuk menangani file DEX besar.
-- **Memory Safety**: Menjamin tidak ada *memory leak* atau *buffer overflow* saat memproses binary yang tidak terpercaya.
-- **Extensibility**: Memungkinkan penambahan fitur (format output baru, resolusi simbol baru) tanpa merombak kode inti.
-- **Library-First**: Didesain sebagai library (Crate) yang bisa diintegrasikan ke project lain.
+## 2. Stakeholders and Concerns
+| Stakeholder | Concerns |
+| :--- | :--- |
+| **Security Researchers** | Memory safety, accuracy of disassembled bytecode, ability to handle malformed files. |
+| **Software Developers** | Reusability as a library, clear API documentation, extensibility for new DEX versions. |
+| **DevOps Engineers** | Build performance, cross-platform compatibility, CI/CD automation. |
+| **System Architects** | Modularity, performance scalability on multi-core systems, technical debt management. |
 
-## 3. High-Level System Architecture
+## 3. Architecture Viewpoints
 
-Project ini dibagi menjadi tiga layer utama:
+### 3.1 Logical Viewpoint
+Focuses on the functional requirements—what the system should do. It describes the design's object-oriented decomposition and module boundaries.
 
-### A. Presentation Layer (CLI & Display)
-- **`cli.rs`**: Menangani argumen baris perintah menggunakan `clap`.
-- **`display/`**: Mengimplementasikan **Strategy Pattern** melalui `DexPrinter` trait untuk menghasilkan output Text atau JSON.
+### 3.2 Process Viewpoint
+Focuses on the runtime behavior, specifically data flow and concurrency management (Parallel Parsing).
 
-### B. Core Logic Layer (Parsers & Instructions)
-- **`parsers/`**: Mengelola pipeline parsing (Header -> Metadata -> Classes).
-- **`instructions/`**: Berisi engine disassembler dan tabel opcode Dalvik.
-- **`context.rs`**: Bertindak sebagai **DI Container** yang menyimpan state parsing dan menyediakan resolusi simbol.
+### 3.3 Implementation (Development) Viewpoint
+Focuses on the organization of actual software modules in the development environment, including layers and dependencies.
 
-### C. Data Access Layer (Models & Utils)
-- **`models/`**: Definisi struktur data DEX yang strongly-typed dan mendukung serialisasi (Serde).
-- **`utils/`**: Fungsi pembantu binari (LEB128, Checksum calculation).
+### 3.4 Deployment Viewpoint
+Focuses on the distribution of the system across platforms and the automated delivery pipeline.
 
-## 4. Key Design Patterns
+---
 
-### 1. Dependency Injection (DI) dengan Traits
-Untuk menghindari ketergantungan keras (*hard coupling*), parser instruksi tidak mengakses data secara langsung melainkan melalui `DexResolver` trait.
-- **Manfaat**: Memudahkan unit testing dengan Mock Objects dan membuat komponen bersifat reusable.
+## 4. Architecture Views
 
-### 2. Strategy Pattern untuk Output
-Antarmuka output didefinisikan melalui trait `DexPrinter`.
-- **Manfaat**: Menambahkan format output baru (misal: XML atau HTML) cukup dengan membuat implementasi trait baru.
+### 4.1 Logical View
+The system utilizes **Dependency Injection (DI)** via Rust Traits to ensure loose coupling between components.
+- **`DexResolver` Trait**: Abstract interface for resolving string, type, method, and field references.
+- **`DexPrinter` Trait**: Strategy pattern for output formatting.
+- **Model Decomposition**: Strong typing for DEX structures (Header, Class, Method, Field) with Serde support.
 
-### 3. Parallel Iteration (Rayon)
-Parsing kelas dilakukan secara paralel menggunakan *Work-stealing* algorithm dari library Rayon.
-- **Manfaat**: Skalabilitas performa linear terhadap jumlah core CPU.
+### 4.2 Process View (Data Flow & Concurrency)
+1. **Header Validation**: Sequential parsing of the file header and endianness detection.
+2. **Metadata Extraction**: Sequential parsing of cross-reference tables (Strings, Types, Protos, Fields, Methods).
+3. **Parallel Class Processing**: Utilizing **Rayon's work-stealing algorithm** to parallelize the disassembly and parsing of class definitions across all available CPU cores.
+4. **Symbol Resolution**: Concurrent lookups via the shared `DexContext`.
 
-## 5. Parsing Pipeline (Data Flow)
+### 4.3 Implementation View
+The project follows a **Layered Architecture**:
+- **Presentation Layer**: `cli.rs` and `display/` (Handles UI and formatting).
+- **Core Logic Layer**: `parsers/` and `instructions/` (Main engine logic).
+- **Domain/Data Layer**: `models/` and `context.rs` (Data structures and state).
+- **Support Layer**: `utils/`, `error.rs`, and `constants.rs`.
 
-1. **Initialization**: Membaca file ke buffer memori.
-2. **Stage 1 (Header)**: Memvalidasi magic number dan menentukan *endianness*.
-3. **Stage 2 (Metadata)**: Parsing tabel string, tipe, prototipe, field, dan method secara sekuensial (karena saling bergantung).
-4. **Stage 3 (Parallel Class Processing)**: 
-   - Memetakan definisi kelas.
-   - Melakukan disassembly bytecode instruksi per method secara paralel.
-   - Resolusi simbol (cross-reference) menggunakan `DexContext`.
-5. **Output**: Mentransformasikan objek `Dex` menjadi format yang diinginkan melalui `DexPrinter`.
+### 4.4 Deployment View
+- **Build System**: Cargo (Rust's package manager).
+- **Target Platforms**: Linux (x86_64), macOS (Intel/ARM), Windows (MSVC).
+- **CI/CD**: GitHub Actions automated pipeline for linting (Clippy), formatting (Fmt), and multi-platform releases.
 
-## 6. CI/CD Pipeline
-Project ini menggunakan GitHub Actions untuk:
-- **CI**: Melakukan pengecekan kualitas kode (linting), formatting, dan unit testing otomatis.
-- **CD**: Membangun binary otomatis untuk Linux, macOS, dan Windows setiap kali ada pembuatan tag versi baru.
+---
 
-## 7. Future Considerations
-- Implementasi analisis aliran data (Data Flow Analysis).
-- Dukungan untuk instruksi ART (Android Runtime) yang dioptimalkan (Vdex/Oat).
-- Penambahan fitur deteksi pola obfuscation.
+## 5. Architecture Rationale
+- **Language Selection (Rust)**: Chosen for memory safety (eliminating common C/C++ vulnerabilities like buffer overflows) and zero-cost abstractions.
+- **Parallelization (Rayon)**: Selected to exceed the performance of the single-threaded `dexdump` tool on multi-core hardware.
+- **Trait-based DI**: Implemented to facilitate unit testing with mock objects and enable library reusability.
+- **Serde**: Integrated for high-performance serialization, allowing the engine to easily provide JSON output for external tool chains.
+
+---
+
+## 6. Consistency and Completeness
+- All logical components (Traits) are mapped directly to implementation files in `src/`.
+- Concurrency models (Rayon) are constrained by Rust's `Send + Sync` traits to ensure thread safety.
+- The architecture supports full ISO compliance by addressing all stakeholder concerns through specific viewpoints.
