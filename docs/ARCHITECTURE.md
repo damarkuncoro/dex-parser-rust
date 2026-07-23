@@ -14,56 +14,58 @@ This document provides a formal architecture description for `dex-parser-rust`, 
 ## 3. Architecture Viewpoints
 
 ### 3.1 Logical Viewpoint
-Focuses on the functional requirements—what the system should do. It describes the design's object-oriented decomposition and module boundaries.
+Focuses on the functional requirements and the object-oriented/module decomposition. The system is designed using **Atomic Parsing & Linking** patterns to isolate physical binary extraction from logical symbol resolution.
 
 ### 3.2 Process Viewpoint
-Focuses on the runtime behavior, specifically data flow and concurrency management (Parallel Parsing).
+Focuses on the runtime behavior, specifically data flow and concurrency management. It highlights the use of **Zero-Copy** techniques and **Parallel Class Processing**.
 
 ### 3.3 Implementation (Development) Viewpoint
-Focuses on the organization of actual software modules in the development environment, including layers and dependencies.
+Focuses on the organization of actual software modules. The project follows a strictly **Layered Architecture** with high internal cohesion and low coupling between parsers.
 
 ### 3.4 Deployment Viewpoint
-Focuses on the distribution of the system across platforms and the automated delivery pipeline.
+Focuses on the distribution across platforms and the automated release pipeline via GitHub Actions.
 
 ---
 
 ## 4. Architecture Views
 
 ### 4.1 Logical View
-The system utilizes **Dependency Injection (DI)** via Rust Traits to ensure loose coupling between components.
-- **`DexResolver` Trait**: Abstract interface for resolving string, type, method, and field references.
-- **`DexPrinter` Trait**: Strategy pattern for output formatting.
-- **Model Decomposition**: Strong typing for DEX structures (Header, Class, Method, Field) with Serde support.
+The system utilizes **Dependency Injection (DI)** via Rust Traits and a **Rule-Based Validation Engine**.
+- **`ValidationRule` Trait**: Allows for a modular, extensible validation system where rules (Magic, Checksum, Offsets) can be added/removed without changing the orchestrator.
+- **`DexResolver` Trait**: Abstract interface for resolving string, type, method, and field references, enabling zero-copy symbol resolution.
+- **`DexPrinter` Trait**: Strategy pattern for output formatting (Text, JSON).
+- **Atomic Parsers**: Each parser module (Header, String, Type, etc.) is independent and only extracts raw structures.
 
 ### 4.2 Process View (Data Flow & Concurrency)
-1. **Header Validation**: Sequential parsing of the file header and endianness detection.
-2. **Metadata Extraction**: Sequential parsing of cross-reference tables (Strings, Types, Protos, Fields, Methods).
-3. **Parallel Class Processing**: Utilizing **Rayon's work-stealing algorithm** to parallelize the disassembly and parsing of class definitions across all available CPU cores.
-4. **Symbol Resolution**: Concurrent lookups via the shared `DexContext`.
+1. **Atomic Extraction (Stage 1)**: Using the stateful `DexReader` to extract raw binary structures into `RawModels`.
+2. **Rule-Based Validation**: Executing the `DexValidator` engine to ensure file integrity.
+3. **Value Resolution (Stage 2)**: Converting binary offsets into string references using **Zero-Copy** lifetimes (`&'a str`).
+4. **Logical Linking (Stage 3)**: The `DexLinker` engine connects raw indices into high-level logical objects (e.g., connecting a Method index to its Class and Signature).
+5. **Parallel High-Level Assembly (Stage 4)**: Utilizing **Rayon** to parallelize class data parsing and disassembly across multiple CPU cores.
 
 ### 4.3 Implementation View
-The project follows a **Layered Architecture**:
-- **Presentation Layer**: `cli.rs` and `display/` (Handles UI and formatting).
-- **Core Logic Layer**: `parsers/` and `instructions/` (Main engine logic).
-- **Domain/Data Layer**: `models/` and `context.rs` (Data structures and state).
-- **Support Layer**: `utils/`, `error.rs`, and `constants.rs`.
+The implementation is highly modularized to avoid "fat files" and ensure scalability:
+- **`readers/`**: Encapsulates low-level binary reading and LEB128 decoding.
+- **`parsers/`**: Contains independent, atomic parsing units for each DEX section.
+- **`linker/`**: Central hub for logical symbol resolution.
+- **`models/`**: Separates `Raw` (physical) models from high-level logical models.
+- **`display/`**: Separates presentation logic into `text` and `json` sub-modules.
 
 ### 4.4 Deployment View
-- **Build System**: Cargo (Rust's package manager).
-- **Target Platforms**: Linux (x86_64), macOS (Intel/ARM), Windows (MSVC).
-- **CI/CD**: GitHub Actions automated pipeline for linting (Clippy), formatting (Fmt), and multi-platform releases.
+- **Multi-Platform CI/CD**: Fully automated pipeline builds and tests on Linux, macOS (x64/ARM), and Windows.
+- **Release Strategy**: Automated binary packaging and GitHub Release generation upon tag creation.
 
 ---
 
 ## 5. Architecture Rationale
-- **Language Selection (Rust)**: Chosen for memory safety (eliminating common C/C++ vulnerabilities like buffer overflows) and zero-cost abstractions.
-- **Parallelization (Rayon)**: Selected to exceed the performance of the single-threaded `dexdump` tool on multi-core hardware.
-- **Trait-based DI**: Implemented to facilitate unit testing with mock objects and enable library reusability.
-- **Serde**: Integrated for high-performance serialization, allowing the engine to easily provide JSON output for external tool chains.
+- **Zero-Copy Lifetime Management**: Chosen to maximize performance and minimize heap allocations by referencing the original buffer.
+- **Parallelization (Rayon)**: Selected to leverage modern multi-core hardware, making the parser significantly faster than single-threaded legacy tools.
+- **Atomic Parsing**: Adopted to ensure that changes in one DEX section's specification do not impact other parser components.
+- **Stateful `DexReader`**: Implemented to provide a safe, stateful cursor that automatically handles bounds checking and endianness.
 
 ---
 
 ## 6. Consistency and Completeness
-- All logical components (Traits) are mapped directly to implementation files in `src/`.
-- Concurrency models (Rayon) are constrained by Rust's `Send + Sync` traits to ensure thread safety.
-- The architecture supports full ISO compliance by addressing all stakeholder concerns through specific viewpoints.
+- All logical components are mapped directly to implementation files in `src/`.
+- The architecture ensures that no parser depends on another, maintaining a "shared-nothing" design until the linking stage.
+- Compliant with ISO 42010 by addressing all primary stakeholder concerns through multiple architectural views.
