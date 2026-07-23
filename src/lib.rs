@@ -1,7 +1,12 @@
-//! # DEX Parser Rust
+//! # dex-parser-rust 🚀
 //!
-//! `dex-parser-rust` is a high-performance library for parsing Android DEX files.
-//! It supports parallel parsing, structured JSON output, and is designed with
-//! modularity and dependency injection in mind.
+//! A high-performance, modular, and parallel Android DEX/APK parsing engine written in Rust.
+//! Designed as a modern, safe, and significantly faster alternative to traditional utilities like `dexdump`.
 
 pub mod dex;
+pub mod ffi;
+
+// Public API Re-exports
+pub use crate::dex::parsers::DexParser;
+pub use crate::dex::models::Dex;
+pub use crate::dex::error::DexError;

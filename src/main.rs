@@ -40,8 +40,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     } else {
-        let parser = DexParser::new(&buffer);
-        let dex = parser.parse()?;
+        // Use the new Public API
+        let dex = DexParser::parse(&buffer)?;
         if let Err(e) = printer.print(&dex, &args.path, &mut stdout) {
             if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }
             return Err(e.into());

@@ -1,7 +1,13 @@
 use clap::{Parser, ValueEnum};
 
+pub const VERSION: &str = concat!(
+    env!("CARGO_PKG_VERSION"),
+    "-",
+    env!("GIT_HASH")
+);
+
 #[derive(Parser)]
-#[command(author, version, about = "A high-performance, modular DEX parser written in Rust", long_about = None)]
+#[command(author, version = VERSION, about = "A high-performance, modular DEX parser written in Rust", long_about = None)]
 pub struct Cli {
     /// Path to the DEX file
     pub path: String,

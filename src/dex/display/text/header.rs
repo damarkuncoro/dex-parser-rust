@@ -50,7 +50,7 @@ pub fn print_header(dex: &Dex, writer: &mut dyn Write) -> std::io::Result<()> {
         "method_ids_off      : {} (0x{:06x})",
         dex.header.method_ids_off, dex.header.method_ids_off
     )?;
-    writeln!(writer, "class_defs_size     : {}", dex.classes.len())?;
+    writeln!(writer, "class_defs_size     : {}", dex.class_defs.len())?;
     writeln!(
         writer,
         "class_defs_off      : {} (0x{:06x})",

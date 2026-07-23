@@ -26,7 +26,7 @@ use serde::Serialize;
 pub struct Dex<'a> {
     pub header: RawHeader,
     pub metadata: DexMetadata<'a>,
-    pub classes: Vec<Class<'a>>,
+    pub class_defs: Vec<Class<'a>>,
     pub map_list: MapList,
 }
 

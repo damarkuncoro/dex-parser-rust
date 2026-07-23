@@ -27,8 +27,7 @@ impl ApkParser {
             // To maintain Zero-copy across the app, we need the buffer to live long enough.
             // For APK extraction, we leak the individual DEX buffers into the heap.
             let leaked_buffer: &'static [u8] = Box::leak(dex_buffer.into_boxed_slice());
-            let parser = DexParser::new(leaked_buffer);
-            let dex = parser.parse()?;
+            let dex = DexParser::parse(leaked_buffer)?;
             dex_files.push(dex);
         }
 

@@ -28,6 +28,7 @@ use self::fields::FieldIdParser;
 use self::classes::ClassDefParser;
 use self::traits::SimpleResolver;
 use scroll::Endian;
+use std::io::Read;
 
 pub struct DexParser<'a> {
     buffer: &'a [u8],
@@ -38,7 +39,12 @@ impl<'a> DexParser<'a> {
         Self { buffer }
     }
 
-    pub fn parse(self) -> Result<Dex<'a>, DexError> {
+    /// Primary entry point: Parse DEX from an in-memory buffer.
+    pub fn parse(buffer: &'a [u8]) -> Result<Dex<'a>, DexError> {
+        Self::new(buffer).parse_internal()
+    }
+
+    fn parse_internal(self) -> Result<Dex<'a>, DexError> {
         let endian = self.detect_endian()?;
         let mut reader = DexReader::new(self.buffer, endian);
 
@@ -111,7 +117,7 @@ impl<'a> DexParser<'a> {
                 fields,
                 methods: methods_display,
             },
-            classes,
+            class_defs: classes,
             map_list,
         })
     }
@@ -120,5 +126,18 @@ impl<'a> DexParser<'a> {
         use scroll::Pread;
         let tag: u32 = self.buffer.pread_with(ENDIAN_TAG, Endian::Little).map_err(DexError::ScrollError)?;
         if tag == ENDIAN_CONSTANT { Ok(Endian::Little) } else { Ok(Endian::Big) }
+    }
+}
+
+/// Standalone convenience functions for the Public API
+impl DexParser<'static> {
+    /// Convenience: Parse DEX directly from a file path.
+    /// Note: This reads and leaks the buffer to provide a 'static lifetime.
+    pub fn parse_file<P: AsRef<std::path::Path>>(path: P) -> Result<Dex<'static>, DexError> {
+        let mut file = std::fs::File::open(path).map_err(DexError::IoError)?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer).map_err(DexError::IoError)?;
+        let leaked: &'static [u8] = Box::leak(buffer.into_boxed_slice());
+        DexParser::parse(leaked)
     }
 }

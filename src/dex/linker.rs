@@ -54,6 +54,7 @@ impl DexLinker {
         };
 
         Class {
+            class_idx: raw_def.class_idx,
             name,
             access_flags: raw_def.access_flags,
             access_flags_text: translate_access_flags(raw_def.access_flags, false),

@@ -5,6 +5,7 @@ use super::encoded_value::EncodedValue;
 
 #[derive(Serialize)]
 pub struct Class<'a> {
+    pub class_idx: u32,
     pub name: &'a str,
     pub access_flags: u32,
     pub access_flags_text: String,

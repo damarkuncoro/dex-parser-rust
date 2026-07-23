@@ -37,21 +37,45 @@ The binary will be available at `./target/release/dex-parser-rust`.
 
 ---
 
-## 🛠 Usage
+## 🛠 Library Usage (Rust)
 
-### Audit an APK (Multidex)
-```bash
-./dex-parser-rust my_app.apk
+Add `dex-parser-rust` to your `Cargo.toml`.
+
+```rust
+use dex_parser_rust::DexParser;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Ergonomic Public API
+    let dex = DexParser::parse_file("classes.dex")?;
+
+    println!("DEX Checksum: {:08x}", dex.header.checksum);
+
+    for class in &dex.class_defs {
+        println!("Class #{}: {}", class.class_idx, class.name);
+    }
+    Ok(())
+}
 ```
 
-### Export to JSON
+---
+
+## 🌐 Cross-Language Integration
+
+### 1. CLI + JSON (Universal)
+Suitable for any language (Python, Node.js, Go).
 ```bash
-./dex-parser-rust classes.dex --format json > output.json
+./dex-parser-rust classes.dex --format json | jq .header.checksum
 ```
 
-### Advanced Disassembly (Verbose)
-```bash
-./dex-parser-rust classes.dex --verbose
+### 2. C-API / FFI (Maximum Performance)
+`dex-parser-rust` can be compiled as a shared library (`.so`, `.dylib`, or `.dll`) for integration into C++, Python (via `ctypes`), or Java (via JNI).
+
+Example (Python using `ctypes`):
+```python
+import ctypes
+lib = ctypes.CDLL("./target/release/libdex_parser_rust.dylib")
+count = lib.get_class_count(b"classes.dex")
+print(f"Total classes: {count}")
 ```
 
 ---
@@ -64,11 +88,12 @@ The binary will be available at `./target/release/dex-parser-rust`.
 
 ## 📂 Project Structure
 
-- `src/dex/readers`: Low-level binary stream management (LEB128, Endianness).
-- `src/dex/parsers`: Atomic units for each DEX section (Header, Strings, Annotations, Code, etc.).
+- `src/dex/readers`: Low-level binary stream management.
+- `src/dex/parsers`: Atomic units for each DEX section.
 - `src/dex/linker`: Central hub for logical symbol resolution.
 - `src/dex/models`: Separation of physical (Raw) and high-level logical models.
 - `src/dex/display`: Strategy-based formatters (Text/JSON).
+- `src/ffi.rs`: Foreign Function Interface exports.
 
 ---
 

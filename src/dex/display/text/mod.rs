@@ -14,7 +14,7 @@ impl DexPrinter for DexDumpPrinter {
         writeln!(writer, "Opened '{}', DEX version '035'", path)?;
         header::print_header(dex, writer)?;
         header::print_map_list(dex, writer)?;
-        for (i, class) in dex.classes.iter().enumerate() {
+        for (i, class) in dex.class_defs.iter().enumerate() {
             class::print_class(dex, i, class, writer)?;
         }
         Ok(())
