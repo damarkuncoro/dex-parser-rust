@@ -1,0 +1,524 @@
+
+--- DEX File #0 ---
+Processing 'workspace/sample/UnCrackable-Level1.apk [DEX #0]'...
+Opened 'workspace/sample/UnCrackable-Level1.apk [DEX #0]', DEX version '035'
+DEX file header:
+magic               : 'dex\n035\0'
+checksum            : 7fb7d9fa
+signature           : b7fa...bec7
+file_size           : 5528
+header_size         : 112
+link_size           : 0
+link_off            : 0 (0x000000)
+string_ids_size     : 123
+string_ids_off      : 112 (0x000070)
+type_ids_size       : 40
+type_ids_off        : 604 (0x00025c)
+proto_ids_size      : 38
+proto_ids_off       : 764 (0x0002fc)
+field_ids_size      : 4
+field_ids_off       : 1220 (0x0004c4)
+method_ids_size     : 55
+method_ids_off      : 1252 (0x0004e4)
+class_defs_size     : 7
+class_defs_off      : 1692 (0x00069c)
+data_size           : 3612
+data_off            : 1916 (0x00077c)
+Map list:
+  #0  type=0x0000 size=1    off=0x000000
+  #1  type=0x0001 size=123  off=0x000070
+  #2  type=0x0002 size=40   off=0x00025c
+  #3  type=0x0003 size=38   off=0x0002fc
+  #4  type=0x0004 size=4    off=0x0004c4
+  #5  type=0x0005 size=55   off=0x0004e4
+  #6  type=0x0006 size=7    off=0x00069c
+  #7  type=0x2001 size=15   off=0x00077c
+  #8  type=0x1001 size=19   off=0x000bb4
+  #9  type=0x2002 size=123  off=0x000c50
+  #10 type=0x2004 size=3    off=0x001430
+  #11 type=0x2000 size=7    off=0x001444
+  #12 type=0x1003 size=2    off=0x0014a8
+  #13 type=0x2006 size=2    off=0x0014c0
+  #14 type=0x1000 size=1    off=0x0014e0
+
+Class #0            -
+  Class descriptor  : 'Lsg/vantagepoint/a/a;'
+  Access flags      : 0x0001 (PUBLIC)
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+  Static fields     -
+  Instance fields   -
+  Direct methods    -
+    #0              : (in Lsg/vantagepoint/a/a;)
+      name          : 'a'
+      type          : 'Lsg/vantagepoint/a/a;->a([B[B)[B'
+      access        : 0x0009 (PUBLIC | STATIC)
+      code          -
+      registers     : 4
+      ins           : 2
+      outs          : 3
+      insns size    : 22 16-bit code units
+      0x0000: new-instance v0, Ljavax/crypto/spec/SecretKeySpec;
+      0x0004: const-string v1, "AES/ECB/PKCS7Padding"
+      0x0008: invoke-direct {v0, v2, v1}, Ljavax/crypto/spec/SecretKeySpec;-><init>([BLjava/lang/String;)V
+      0x000e: const-string v2, "AES"
+      0x0012: invoke-static {v2}, Ljavax/crypto/Cipher;->getInstance(Ljava/lang/String;)Ljavax/crypto/Cipher;
+      0x0018: move-result-object v2
+      0x001a: const/4 v1, #+2 (0x2)
+      0x001c: invoke-virtual {v2, v1, v0}, Ljavax/crypto/Cipher;->init(ILjava/security/Key;)V
+      0x0022: invoke-virtual {v2, v3}, Ljavax/crypto/Cipher;->doFinal([B)[B
+      0x0028: move-result-object v2
+      0x002a: return-object v2
+      catches       : (none)
+      positions     :
+      locals        :
+  Virtual methods   -
+  source_file_idx   : -1 (unknown)
+
+Class #1            -
+  Class descriptor  : 'Lsg/vantagepoint/a/b;'
+  Access flags      : 0x0001 (PUBLIC)
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+  Static fields     -
+  Instance fields   -
+  Direct methods    -
+    #0              : (in Lsg/vantagepoint/a/b;)
+      name          : 'a'
+      type          : 'Lsg/vantagepoint/a/b;->a(Landroid/content/Context;)Z'
+      access        : 0x0009 (PUBLIC | STATIC)
+      code          -
+      registers     : 1
+      ins           : 1
+      outs          : 1
+      insns size    : 18 16-bit code units
+      0x0000: invoke-virtual {v0}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+      0x0006: move-result-object v0
+      0x0008: invoke-virtual {v0}, Landroid/content/Context;->getApplicationInfo()Landroid/content/pm/ApplicationInfo;
+      0x000e: move-result-object v0
+      0x0010: iget v0, v0, Landroid/content/pm/ApplicationInfo;->flags:I
+      0x0014: and-int/lit8 v0, v0, #2
+      0x0018: if-eqz v0, :label_0020
+      0x001c: const/4 v0, #+1 (0x1)
+      0x001e: return v0
+      0x0020: const/4 v0, #+0 (0x0)
+      0x0022: return v0
+      catches       : (none)
+      positions     :
+      locals        :
+  Virtual methods   -
+  source_file_idx   : -1 (unknown)
+
+Class #2            -
+  Class descriptor  : 'Lsg/vantagepoint/a/c;'
+  Access flags      : 0x0001 (PUBLIC)
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+  Static fields     -
+  Instance fields   -
+  Direct methods    -
+    #0              : (in Lsg/vantagepoint/a/c;)
+      name          : 'a'
+      type          : 'Lsg/vantagepoint/a/c;->a()Z'
+      access        : 0x0009 (PUBLIC | STATIC)
+      code          -
+      registers     : 7
+      ins           : 0
+      outs          : 3
+      insns size    : 38 16-bit code units
+      0x0000: const-string v0, "PATH"
+      0x0004: invoke-static {v0}, Ljava/lang/System;->getenv(Ljava/lang/String;)Ljava/lang/String;
+      0x000a: move-result-object v0
+      0x000c: const-string v1, ":"
+      0x0010: invoke-virtual {v0, v1}, Ljava/lang/String;->split(Ljava/lang/String;)[Ljava/lang/String;
+      0x0016: move-result-object v0
+      0x0018: array-length v1, v0
+      0x001a: const/4 v2, #+0 (0x0)
+      0x001c: const/4 v3, #+0 (0x0)
+      0x001e: if-ge v3, v1, :label_004a
+      0x0022: aget-object v4, v0, v3
+      0x0026: new-instance v5, Ljava/io/File;
+      0x002a: const-string v6, "su"
+      0x002e: invoke-direct {v5, v4, v6}, Ljava/io/File;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+      0x0034: invoke-virtual {v5}, Ljava/io/File;->exists()Z
+      0x003a: move-result v4
+      0x003c: if-eqz v4, :label_0044
+      0x0040: const/4 v0, #+1 (0x1)
+      0x0042: return v0
+      0x0044: add-int/lit8 v3, v3, #1
+      0x0048: goto :label_001e
+      0x004a: return v2
+      catches       : (none)
+      positions     :
+      locals        :
+    #1              : (in Lsg/vantagepoint/a/c;)
+      name          : 'b'
+      type          : 'Lsg/vantagepoint/a/c;->b()Z'
+      access        : 0x0009 (PUBLIC | STATIC)
+      code          -
+      registers     : 2
+      ins           : 0
+      outs          : 2
+      insns size    : 16 16-bit code units
+      0x0000: sget-object v0, Landroid/os/Build;->TAGS:Ljava/lang/String;
+      0x0004: if-eqz v0, :label_001c
+      0x0008: const-string v1, "test-keys"
+      0x000c: invoke-virtual {v0, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+      0x0012: move-result v0
+      0x0014: if-eqz v0, :label_001c
+      0x0018: const/4 v0, #+1 (0x1)
+      0x001a: return v0
+      0x001c: const/4 v0, #+0 (0x0)
+      0x001e: return v0
+      catches       : (none)
+      positions     :
+      locals        :
+    #2              : (in Lsg/vantagepoint/a/c;)
+      name          : 'c'
+      type          : 'Lsg/vantagepoint/a/c;->c()Z'
+      access        : 0x0009 (PUBLIC | STATIC)
+      code          -
+      registers     : 7
+      ins           : 0
+      outs          : 7
+      insns size    : 42 16-bit code units
+      0x0000: const-string v0, "/system/app/Superuser.apk"
+      0x0004: const-string v1, "/system/xbin/daemonsu"
+      0x0008: const-string v2, "/system/etc/init.d/99SuperSUDaemon"
+      0x000c: const-string v3, "/system/bin/.ext/.su"
+      0x0010: const-string v4, "/system/etc/.has_su_daemon"
+      0x0014: const-string v5, "/system/etc/.installed_su_daemon"
+      0x0018: const-string v6, "/dev/com.koushikdutta.superuser.daemon/"
+      0x001c: filled-new-array/range {v0 .. v6}, [Ljava/lang/String;
+      0x0022: move-result-object v0
+      0x0024: array-length v1, v0
+      0x0026: const/4 v2, #+0 (0x0)
+      0x0028: const/4 v3, #+0 (0x0)
+      0x002a: if-ge v3, v1, :label_0052
+      0x002e: aget-object v4, v0, v3
+      0x0032: new-instance v5, Ljava/io/File;
+      0x0036: invoke-direct {v5, v4}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+      0x003c: invoke-virtual {v5}, Ljava/io/File;->exists()Z
+      0x0042: move-result v4
+      0x0044: if-eqz v4, :label_004c
+      0x0048: const/4 v0, #+1 (0x1)
+      0x004a: return v0
+      0x004c: add-int/lit8 v3, v3, #1
+      0x0050: goto :label_002a
+      0x0052: return v2
+      catches       : (none)
+      positions     :
+      locals        :
+  Virtual methods   -
+  source_file_idx   : -1 (unknown)
+
+Class #3            -
+  Class descriptor  : 'Lsg/vantagepoint/uncrackable1/MainActivity$1;'
+  Access flags      : 0x0000 ()
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+    #0              : 'Landroid/content/DialogInterface$OnClickListener;'
+  Static fields     -
+  Instance fields   -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity$1;)
+      name          : 'a'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity;'
+      access        : 0x1010 (FINAL | SYNTHETIC)
+  Direct methods    -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity$1;)
+      name          : '<init>'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity$1;-><init>(Lsg/vantagepoint/uncrackable1/MainActivity;)V'
+      access        : 0x10000 (CONSTRUCTOR)
+      code          -
+      registers     : 2
+      ins           : 2
+      outs          : 1
+      insns size    : 6 16-bit code units
+      0x0000: iput-object v1, v0, Lsg/vantagepoint/uncrackable1/MainActivity$1;->a:Lsg/vantagepoint/uncrackable1/MainActivity;
+      0x0004: invoke-direct {v0}, Ljava/lang/Object;-><init>()V
+      0x000a: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+  Virtual methods   -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity$1;)
+      name          : 'onClick'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity$1;->onClick(Landroid/content/DialogInterface;I)V'
+      access        : 0x0001 (PUBLIC)
+      code          -
+      registers     : 3
+      ins           : 3
+      outs          : 1
+      insns size    : 5 16-bit code units
+      0x0000: const/4 v1, #+0 (0x0)
+      0x0002: invoke-static {v1}, Ljava/lang/System;->exit(I)V
+      0x0008: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+  source_file_idx   : -1 (unknown)
+
+Class #4            -
+  Class descriptor  : 'Lsg/vantagepoint/uncrackable1/MainActivity$2;'
+  Access flags      : 0x0000 ()
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+    #0              : 'Landroid/content/DialogInterface$OnClickListener;'
+  Static fields     -
+  Instance fields   -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity$2;)
+      name          : 'a'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity;'
+      access        : 0x1010 (FINAL | SYNTHETIC)
+  Direct methods    -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity$2;)
+      name          : '<init>'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity$2;-><init>(Lsg/vantagepoint/uncrackable1/MainActivity;)V'
+      access        : 0x10000 (CONSTRUCTOR)
+      code          -
+      registers     : 2
+      ins           : 2
+      outs          : 1
+      insns size    : 6 16-bit code units
+      0x0000: iput-object v1, v0, Lsg/vantagepoint/uncrackable1/MainActivity$2;->a:Lsg/vantagepoint/uncrackable1/MainActivity;
+      0x0004: invoke-direct {v0}, Ljava/lang/Object;-><init>()V
+      0x000a: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+  Virtual methods   -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity$2;)
+      name          : 'onClick'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity$2;->onClick(Landroid/content/DialogInterface;I)V'
+      access        : 0x0001 (PUBLIC)
+      code          -
+      registers     : 3
+      ins           : 3
+      outs          : 1
+      insns size    : 4 16-bit code units
+      0x0000: invoke-interface {v1}, Landroid/content/DialogInterface;->dismiss()V
+      0x0006: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+  source_file_idx   : -1 (unknown)
+
+Class #5            -
+  Class descriptor  : 'Lsg/vantagepoint/uncrackable1/MainActivity;'
+  Access flags      : 0x0001 (PUBLIC)
+  Superclass        : 'Landroid/app/Activity;'
+  Interfaces        -
+  Static fields     -
+  Instance fields   -
+  Direct methods    -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity;)
+      name          : '<init>'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity;-><init>()V'
+      access        : 0x10001 (PUBLIC | CONSTRUCTOR)
+      code          -
+      registers     : 1
+      ins           : 1
+      outs          : 1
+      insns size    : 4 16-bit code units
+      0x0000: invoke-direct {v0}, Landroid/app/Activity;-><init>()V
+      0x0006: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+    #1              : (in Lsg/vantagepoint/uncrackable1/MainActivity;)
+      name          : 'a'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity;->a(Ljava/lang/String;)V'
+      access        : 0x0002 (PRIVATE)
+      code          -
+      registers     : 5
+      ins           : 2
+      outs          : 4
+      insns size    : 36 16-bit code units
+      0x0000: new-instance v0, Landroid/app/AlertDialog$Builder;
+      0x0004: invoke-direct {v0, v3}, Landroid/app/AlertDialog$Builder;-><init>(Landroid/content/Context;)V
+      0x000a: invoke-virtual {v0}, Landroid/app/AlertDialog$Builder;->create()Landroid/app/AlertDialog;
+      0x0010: move-result-object v0
+      0x0012: invoke-virtual {v0, v4}, Landroid/app/AlertDialog;->setTitle(Ljava/lang/CharSequence;)V
+      0x0018: const-string v4, "This is unacceptable. The app is now going to exit."
+      0x001c: invoke-virtual {v0, v4}, Landroid/app/AlertDialog;->setMessage(Ljava/lang/CharSequence;)V
+      0x0022: const-string v4, "OK"
+      0x0026: new-instance v1, Lsg/vantagepoint/uncrackable1/MainActivity$1;
+      0x002a: invoke-direct {v1, v3}, Lsg/vantagepoint/uncrackable1/MainActivity$1;-><init>(Lsg/vantagepoint/uncrackable1/MainActivity;)V
+      0x0030: const/4 v2, #+13 (0xd)
+      0x0032: invoke-virtual {v0, v2, v4, v1}, Landroid/app/AlertDialog;->setButton(ILjava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)V
+      0x0038: const/4 v4, #+0 (0x0)
+      0x003a: invoke-virtual {v0, v4}, Landroid/app/AlertDialog;->setCancelable(Z)V
+      0x0040: invoke-virtual {v0}, Landroid/app/AlertDialog;->show()V
+      0x0046: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+  Virtual methods   -
+    #0              : (in Lsg/vantagepoint/uncrackable1/MainActivity;)
+      name          : 'onCreate'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity;->onCreate(Landroid/os/Bundle;)V'
+      access        : 0x0004 (PROTECTED)
+      code          -
+      registers     : 3
+      ins           : 2
+      outs          : 2
+      insns size    : 47 16-bit code units
+      0x0000: invoke-static {}, Lsg/vantagepoint/a/c;->a()Z
+      0x0006: move-result v0
+      0x0008: if-nez v0, :label_0024
+      0x000c: invoke-static {}, Lsg/vantagepoint/a/c;->b()Z
+      0x0012: move-result v0
+      0x0014: if-nez v0, :label_0024
+      0x0018: invoke-static {}, Lsg/vantagepoint/a/c;->c()Z
+      0x001e: move-result v0
+      0x0020: if-eqz v0, :label_002e
+      0x0024: const-string v0, "Root detected!"
+      0x0028: invoke-direct {v1, v0}, Lsg/vantagepoint/uncrackable1/MainActivity;->a(Ljava/lang/String;)V
+      0x002e: invoke-virtual {v1}, Lsg/vantagepoint/uncrackable1/MainActivity;->getApplicationContext()Landroid/content/Context;
+      0x0034: move-result-object v0
+      0x0036: invoke-static {v0}, Lsg/vantagepoint/a/b;->a(Landroid/content/Context;)Z
+      0x003c: move-result v0
+      0x003e: if-eqz v0, :label_004c
+      0x0042: const-string v0, "App is debuggable!"
+      0x0046: invoke-direct {v1, v0}, Lsg/vantagepoint/uncrackable1/MainActivity;->a(Ljava/lang/String;)V
+      0x004c: invoke-super {v1, v2}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
+      0x0052: const/high16 v2, #0x7f030000
+      0x0056: invoke-virtual {v1, v2}, Lsg/vantagepoint/uncrackable1/MainActivity;->setContentView(I)V
+      0x005c: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+    #1              : (in Lsg/vantagepoint/uncrackable1/MainActivity;)
+      name          : 'verify'
+      type          : 'Lsg/vantagepoint/uncrackable1/MainActivity;->verify(Landroid/view/View;)V'
+      access        : 0x0001 (PUBLIC)
+      code          -
+      registers     : 5
+      ins           : 2
+      outs          : 4
+      insns size    : 66 16-bit code units
+      0x0000: const v4, #0x7f020001
+      0x0006: invoke-virtual {v3, v4}, Lsg/vantagepoint/uncrackable1/MainActivity;->findViewById(I)Landroid/view/View;
+      0x000c: move-result-object v4
+      0x000e: check-cast v4, Landroid/widget/EditText;
+      0x0012: invoke-virtual {v4}, Landroid/widget/EditText;->getText()Landroid/text/Editable;
+      0x0018: move-result-object v4
+      0x001a: invoke-virtual {v4}, Ljava/lang/Object;->toString()Ljava/lang/String;
+      0x0020: move-result-object v4
+      0x0022: new-instance v0, Landroid/app/AlertDialog$Builder;
+      0x0026: invoke-direct {v0, v3}, Landroid/app/AlertDialog$Builder;-><init>(Landroid/content/Context;)V
+      0x002c: invoke-virtual {v0}, Landroid/app/AlertDialog$Builder;->create()Landroid/app/AlertDialog;
+      0x0032: move-result-object v0
+      0x0034: invoke-static {v4}, Lsg/vantagepoint/uncrackable1/a;->a(Ljava/lang/String;)Z
+      0x003a: move-result v4
+      0x003c: if-eqz v4, :label_0056
+      0x0040: const-string v4, "Success!"
+      0x0044: invoke-virtual {v0, v4}, Landroid/app/AlertDialog;->setTitle(Ljava/lang/CharSequence;)V
+      0x004a: const-string v4, "This is the correct secret."
+      0x004e: invoke-virtual {v0, v4}, Landroid/app/AlertDialog;->setMessage(Ljava/lang/CharSequence;)V
+      0x0054: goto :label_0066
+      0x0056: const-string v4, "Nope..."
+      0x005a: invoke-virtual {v0, v4}, Landroid/app/AlertDialog;->setTitle(Ljava/lang/CharSequence;)V
+      0x0060: const-string v4, "That's not it. Try again."
+      0x0064: goto :label_004e
+      0x0066: const/4 v4, #+13 (0xd)
+      0x0068: const-string v1, "OK"
+      0x006c: new-instance v2, Lsg/vantagepoint/uncrackable1/MainActivity$2;
+      0x0070: invoke-direct {v2, v3}, Lsg/vantagepoint/uncrackable1/MainActivity$2;-><init>(Lsg/vantagepoint/uncrackable1/MainActivity;)V
+      0x0076: invoke-virtual {v0, v4, v1, v2}, Landroid/app/AlertDialog;->setButton(ILjava/lang/CharSequence;Landroid/content/DialogInterface$OnClickListener;)V
+      0x007c: invoke-virtual {v0}, Landroid/app/AlertDialog;->show()V
+      0x0082: return-void 
+      catches       : (none)
+      positions     :
+      locals        :
+  source_file_idx   : -1 (unknown)
+
+Class #6            -
+  Class descriptor  : 'Lsg/vantagepoint/uncrackable1/a;'
+  Access flags      : 0x0001 (PUBLIC)
+  Superclass        : 'Ljava/lang/Object;'
+  Interfaces        -
+  Static fields     -
+  Instance fields   -
+  Direct methods    -
+    #0              : (in Lsg/vantagepoint/uncrackable1/a;)
+      name          : 'a'
+      type          : 'Lsg/vantagepoint/uncrackable1/a;->a(Ljava/lang/String;)Z'
+      access        : 0x0009 (PUBLIC | STATIC)
+      code          -
+      registers     : 6
+      ins           : 1
+      outs          : 2
+      insns size    : 58 16-bit code units
+      0x0000: const-string v0, "8d127684cbc37c17616d806cf50473cc"
+      0x0004: const-string v1, "5UJiFctbmgbDoLXmpL12mkno8HT4Lv8dlat8FxR2GOc="
+      0x0008: const/4 v2, #+0 (0x0)
+      0x000a: invoke-static {v1, v2}, Landroid/util/Base64;->decode(Ljava/lang/String;I)[B
+      0x0010: move-result-object v1
+      0x0012: new-array v2, v2, [B
+      0x0016: invoke-static {v0}, Lsg/vantagepoint/uncrackable1/a;->b(Ljava/lang/String;)[B
+      0x001c: move-result-object v0
+      0x001e: invoke-static {v0, v1}, Lsg/vantagepoint/a/a;->a([B[B)[B
+      0x0024: move-result-object v0
+      0x0026: goto :label_0060
+      0x0028: move-exception v0
+      0x002a: const-string v1, "CodeCheck"
+      0x002e: new-instance v3, Ljava/lang/StringBuilder;
+      0x0032: invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
+      0x0038: const-string v4, "AES error:"
+      0x003c: invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      0x0042: invoke-virtual {v0}, Ljava/lang/Exception;->getMessage()Ljava/lang/String;
+      0x0048: move-result-object v0
+      0x004a: invoke-virtual {v3, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      0x0050: invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+      0x0056: move-result-object v0
+      0x0058: invoke-static {v1, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+      0x005e: move-object v0, v2
+      0x0060: new-instance v1, Ljava/lang/String;
+      0x0064: invoke-direct {v1, v0}, Ljava/lang/String;-><init>([B)V
+      0x006a: invoke-virtual {v5, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+      0x0070: move-result v5
+      0x0072: return v5
+      catches       : 1
+        try #0 0x000b - 0x0013
+          catch Ljava/lang/Exception; -> 0x0014
+      positions     :
+      locals        :
+    #1              : (in Lsg/vantagepoint/uncrackable1/a;)
+      name          : 'b'
+      type          : 'Lsg/vantagepoint/uncrackable1/a;->b(Ljava/lang/String;)[B'
+      access        : 0x0009 (PUBLIC | STATIC)
+      code          -
+      registers     : 8
+      ins           : 1
+      outs          : 2
+      insns size    : 43 16-bit code units
+      0x0000: invoke-virtual {v7}, Ljava/lang/String;->length()I
+      0x0006: move-result v0
+      0x0008: div-int/lit8 v1, v0, #2
+      0x000c: new-array v1, v1, [B
+      0x0010: const/4 v2, #+0 (0x0)
+      0x0012: if-ge v2, v0, :label_0054
+      0x0016: div-int/lit8 v3, v2, #2
+      0x001a: invoke-virtual {v7, v2}, Ljava/lang/String;->charAt(I)C
+      0x0020: move-result v4
+      0x0022: const/16 v5, #+16 (0x0010)
+      0x0026: invoke-static {v4, v5}, Ljava/lang/Character;->digit(CI)I
+      0x002c: move-result v4
+      0x002e: shl-int/lit8 v4, v4, #4
+      0x0032: add-int/lit8 v6, v2, #1
+      0x0036: invoke-virtual {v7, v6}, Ljava/lang/String;->charAt(I)C
+      0x003c: move-result v6
+      0x003e: invoke-static {v6, v5}, Ljava/lang/Character;->digit(CI)I
+      0x0044: move-result v5
+      0x0046: add-int/2addr v4, v5
+      0x0048: int-to-byte v4, v4
+      0x004a: aput-byte v4, v1, v3
+      0x004e: add-int/lit8 v2, v2, #2
+      0x0052: goto :label_0012
+      0x0054: return-object v1
+      catches       : (none)
+      positions     :
+      locals        :
+  Virtual methods   -
+  source_file_idx   : -1 (unknown)

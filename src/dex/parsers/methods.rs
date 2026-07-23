@@ -1,29 +1,19 @@
-use crate::dex::constants::sizes::METHOD_ID_ITEM;
 use crate::dex::error::DexError;
-use crate::dex::models::header::RawHeader;
 use crate::dex::models::raw::RawMethodId;
-use scroll::{Endian, Pread};
+use crate::dex::readers::DexReader;
+use scroll::Pread;
 
-pub fn parse(
-    buffer: &[u8],
-    header: &RawHeader,
-    strings: &[String],
-    types: &[String],
-    endian: Endian,
-) -> Result<Vec<String>, DexError> {
-    let mut methods = Vec::with_capacity(header.method_ids_size as usize);
-    for i in 0..header.method_ids_size {
-        let off = (header.method_ids_off as usize) + (i as usize * METHOD_ID_ITEM);
-        let method_id: RawMethodId = buffer.pread_with(off, endian)?;
+pub struct MethodIdParser;
 
-        let class_name = types.get(method_id.class_idx as usize).ok_or_else(|| {
-            DexError::InvalidIndex(format!("Method class_idx {}", method_id.class_idx))
-        })?;
-        let method_name = strings.get(method_id.name_idx as usize).ok_or_else(|| {
-            DexError::InvalidIndex(format!("Method name_idx {}", method_id.name_idx))
-        })?;
-
-        methods.push(format!("{}->{}", class_name, method_name));
+impl MethodIdParser {
+    pub fn parse(reader: &mut DexReader, size: u32, offset: u32) -> Result<Vec<RawMethodId>, DexError> {
+        reader.seek(offset as usize)?;
+        let mut methods = Vec::with_capacity(size as usize);
+        for _ in 0..size {
+            let bytes = reader.read_bytes(8)?;
+            let method: RawMethodId = bytes.pread_with(0, reader.endian()).map_err(DexError::ScrollError)?;
+            methods.push(method);
+        }
+        Ok(methods)
     }
-    Ok(methods)
 }

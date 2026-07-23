@@ -1,59 +1,66 @@
-pub mod class;
-pub mod field;
 pub mod header;
+pub mod class;
 pub mod method;
+pub mod field;
+pub mod type_id;
 pub mod proto;
 pub mod raw;
-pub mod type_id;
+pub mod encoded_value;
+pub mod annotation;
+pub mod map_list;
 
-pub use class::{CatchHandler, Class, Code, EncodedField, Instruction, TryHandler};
-pub use field::Field;
 pub use header::RawHeader;
+pub use class::{Class, Code, Instruction, EncodedField, CatchHandler, TryHandler, DebugInfo, DebugEntry};
+pub use field::Field;
 pub use method::EncodedMethod;
 pub use proto::Proto;
+pub use encoded_value::{EncodedValue, EncodedAnnotation, AnnotationElement};
+pub use annotation::{AnnotationsDirectory, AnnotationItem, FieldAnnotation, MethodAnnotation, ParameterAnnotation};
+pub use map_list::{MapList, MapItem};
 
+use crate::dex::parsers::traits::{StringResolver, TypeResolver, MethodResolver, FieldResolver, DexResolver};
 use serde::Serialize;
 
-/// Represents a fully parsed Android DEX file.
-///
-/// This structure contains all the metadata, string tables, type definitions,
-/// field/method prototypes, and class definitions extracted from the DEX binary.
+/// Represents a fully parsed Android DEX file using zero-copy where possible.
 #[derive(Serialize)]
-pub struct Dex {
-    /// The original DEX header information.
+pub struct Dex<'a> {
     pub header: RawHeader,
-    /// All strings defined in the DEX file.
-    pub strings: Vec<String>,
-    /// All type descriptors (e.g., "Ljava/lang/String;").
-    pub types: Vec<String>,
-    /// Method and field prototypes.
-    pub protos: Vec<Proto>,
-    /// Field definitions.
-    pub fields: Vec<Field>,
-    /// Method name/signature descriptors.
+    pub metadata: DexMetadata<'a>,
+    pub classes: Vec<Class<'a>>,
+    pub map_list: MapList,
+}
+
+#[derive(Serialize, Clone)]
+pub struct DexMetadata<'a> {
+    pub strings: Vec<&'a str>,
+    pub types: Vec<&'a str>,
+    pub protos: Vec<Proto<'a>>,
+    pub fields: Vec<Field<'a>>,
     pub methods: Vec<String>,
-    /// High-level class definitions, including bytecode.
-    pub classes: Vec<Class>,
 }
 
-impl Dex {
-    /// Resolves a string by its index.
-    pub fn get_string(&self, idx: u32) -> Option<&String> {
-        self.strings.get(idx as usize)
-    }
-
-    /// Resolves a type name by its index.
-    pub fn get_type(&self, idx: u32) -> Option<&String> {
-        self.types.get(idx as usize)
-    }
-
-    /// Resolves a method signature by its index.
-    pub fn get_method(&self, idx: u32) -> Option<&String> {
-        self.methods.get(idx as usize)
-    }
-
-    /// Resolves a field definition by its index.
-    pub fn get_field(&self, idx: u32) -> Option<&Field> {
-        self.fields.get(idx as usize)
+impl<'a> StringResolver<'a> for DexMetadata<'a> {
+    fn resolve_string(&self, idx: u32) -> Option<&'a str> {
+        self.strings.get(idx as usize).copied()
     }
 }
+
+impl<'a> TypeResolver<'a> for DexMetadata<'a> {
+    fn resolve_type(&self, idx: u32) -> Option<&'a str> {
+        self.types.get(idx as usize).copied()
+    }
+}
+
+impl<'a> MethodResolver for DexMetadata<'a> {
+    fn resolve_method(&self, idx: u32) -> Option<String> {
+        self.methods.get(idx as usize).cloned()
+    }
+}
+
+impl<'a> FieldResolver<'a> for DexMetadata<'a> {
+    fn resolve_field(&self, idx: u32) -> Option<Field<'a>> {
+        self.fields.get(idx as usize).cloned()
+    }
+}
+
+impl<'a> DexResolver<'a> for DexMetadata<'a> {}

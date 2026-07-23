@@ -10,11 +10,11 @@ pub struct RawMethodId {
 }
 
 #[derive(Serialize)]
-pub struct EncodedMethod {
-    pub name: String,
+pub struct EncodedMethod<'a> {
+    pub name: &'a str,
     pub signature: String, // Contoh: ([B[B)[B
     pub access_flags: u32,
     pub access_flags_text: String, // Contoh: PUBLIC STATIC
     pub code_off: u64,
-    pub code: Option<Code>,
+    pub code: Option<Code<'a>>,
 }

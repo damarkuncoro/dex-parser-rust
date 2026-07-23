@@ -5,20 +5,20 @@ use scroll::Endian;
 
 struct MockResolver;
 
-impl StringResolver for MockResolver {
-    fn resolve_string(&self, idx: u32) -> Option<String> {
+impl<'a> StringResolver<'a> for MockResolver {
+    fn resolve_string(&self, idx: u32) -> Option<&'a str> {
         if idx == 1 {
-            Some("HelloRust".to_string())
+            Some("HelloRust")
         } else {
             None
         }
     }
 }
 
-impl TypeResolver for MockResolver {
-    fn resolve_type(&self, idx: u32) -> Option<String> {
+impl<'a> TypeResolver<'a> for MockResolver {
+    fn resolve_type(&self, idx: u32) -> Option<&'a str> {
         if idx == 2 {
-            Some("Ljava/lang/String;".to_string())
+            Some("Ljava/lang/String;")
         } else {
             None
         }
@@ -35,13 +35,13 @@ impl MethodResolver for MockResolver {
     }
 }
 
-impl FieldResolver for MockResolver {
-    fn resolve_field(&self, idx: u32) -> Option<Field> {
+impl<'a> FieldResolver<'a> for MockResolver {
+    fn resolve_field(&self, idx: u32) -> Option<Field<'a>> {
         if idx == 4 {
             Some(Field {
-                class: "Ljava/lang/System;".to_string(),
-                name: "out".to_string(),
-                type_name: "Ljava/io/PrintStream;".to_string(),
+                class: "Ljava/lang/System;",
+                name: "out",
+                type_name: "Ljava/io/PrintStream;",
             })
         } else {
             None
@@ -49,7 +49,7 @@ impl FieldResolver for MockResolver {
     }
 }
 
-impl DexResolver for MockResolver {}
+impl<'a> DexResolver<'a> for MockResolver {}
 
 #[test]
 fn test_decode_const_string() {
@@ -67,10 +67,10 @@ fn test_decode_const_string() {
 fn test_decode_sget() {
     let resolver = MockResolver;
     let decoder = InstructionDecoder::new(&resolver);
-    let buffer = [0x62, 0x00, 0x04, 0x00]; // sget v0, field@0004
+    let buffer = [0x62, 0x00, 0x04, 0x00]; // sget-object v0, field@0004
     let (ins, _) = decoder.decode(&buffer, 0, 0, Endian::Little);
 
-    assert_eq!(ins.name, "sget");
+    assert_eq!(ins.name, "sget-object");
     assert!(ins
         .description
         .contains("Ljava/lang/System;->out:Ljava/io/PrintStream;"));

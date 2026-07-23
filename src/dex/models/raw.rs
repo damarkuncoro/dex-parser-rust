@@ -1,27 +1,28 @@
 use scroll::Pread;
+use serde::Serialize;
 
-#[derive(Debug, Pread)]
+#[derive(Debug, Pread, Serialize, Clone)]
 pub struct RawMethodId {
     pub class_idx: u16,
     pub proto_idx: u16,
     pub name_idx: u32,
 }
 
-#[derive(Debug, Pread)]
+#[derive(Debug, Pread, Serialize, Clone)]
 pub struct RawProtoId {
     pub shorty_idx: u32,
     pub return_type_idx: u32,
     pub parameters_off: u32,
 }
 
-#[derive(Debug, Pread)]
+#[derive(Debug, Pread, Serialize, Clone)]
 pub struct RawFieldId {
     pub class_idx: u16,
     pub type_idx: u16,
     pub name_idx: u32,
 }
 
-#[derive(Debug, Pread)]
+#[derive(Debug, Pread, Serialize, Clone)]
 pub struct RawClassDef {
     pub class_idx: u32,
     pub access_flags: u32,
@@ -33,7 +34,7 @@ pub struct RawClassDef {
     pub static_values_off: u32,
 }
 
-#[derive(Debug, Pread)]
+#[derive(Debug, Pread, Serialize, Clone)]
 pub struct RawCodeItem {
     pub registers_size: u16,
     pub ins_size: u16,

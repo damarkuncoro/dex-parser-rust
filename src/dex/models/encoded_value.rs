@@ -2,7 +2,7 @@ use serde::Serialize;
 
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
-pub enum EncodedValue {
+pub enum EncodedValue<'a> {
     Byte(i8),
     Short(i16),
     Char(u16),
@@ -12,25 +12,25 @@ pub enum EncodedValue {
     Double(f64),
     MethodType(u32),
     MethodHandle(u32),
-    String(String),
-    Type(String),
+    String(&'a str),
+    Type(&'a str),
     Field(String),
     Method(String),
     Enum(String),
-    Array(Vec<EncodedValue>),
-    Annotation(EncodedAnnotation),
+    Array(Vec<EncodedValue<'a>>),
+    Annotation(EncodedAnnotation<'a>),
     Null,
     Boolean(bool),
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub struct EncodedAnnotation {
-    pub type_name: String,
-    pub elements: Vec<AnnotationElement>,
+pub struct EncodedAnnotation<'a> {
+    pub type_name: &'a str,
+    pub elements: Vec<AnnotationElement<'a>>,
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub struct AnnotationElement {
-    pub name: String,
-    pub value: EncodedValue,
+pub struct AnnotationElement<'a> {
+    pub name: &'a str,
+    pub value: EncodedValue<'a>,
 }

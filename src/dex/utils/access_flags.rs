@@ -1,80 +1,51 @@
+use crate::dex::constants::access_flags as masks;
+
 pub fn translate_access_flags(flags: u32, context_is_method: bool) -> String {
     let mut result = Vec::new();
 
-    // Common flags
-    if flags & 0x0001 != 0 {
-        result.push("PUBLIC");
-    }
-    if flags & 0x0002 != 0 {
-        result.push("PRIVATE");
-    }
-    if flags & 0x0004 != 0 {
-        result.push("PROTECTED");
-    }
-    if flags & 0x0008 != 0 {
-        result.push("STATIC");
-    }
-    if flags & 0x0010 != 0 {
-        result.push("FINAL");
-    }
+    // 1. Visibility
+    if flags & masks::PUBLIC != 0 { result.push("PUBLIC"); }
+    if flags & masks::PRIVATE != 0 { result.push("PRIVATE"); }
+    if flags & masks::PROTECTED != 0 { result.push("PROTECTED"); }
 
-    // Class/Field/Method specific
-    if flags & 0x0020 != 0 {
+    // 2. Modifiers
+    if flags & masks::STATIC != 0 { result.push("STATIC"); }
+    if flags & masks::FINAL != 0 { result.push("FINAL"); }
+    if flags & masks::ABSTRACT != 0 { result.push("ABSTRACT"); }
+
+    // 3. Method/Field Specific
+    if flags & masks::NATIVE != 0 { result.push("NATIVE"); }
+
+    if flags & masks::SYNCHRONIZED != 0 {
         if context_is_method {
             result.push("SYNCHRONIZED");
-        } else {
-            // For classes, 0x20 is usually SUPER (acc_super)
-            // But dexdump often doesn't show it as text unless it's a specific flag
         }
     }
 
-    if flags & 0x0040 != 0 {
-        if context_is_method {
-            result.push("BRIDGE");
-        } else {
-            result.push("VOLATILE");
-        }
+    if flags & masks::VOLATILE != 0 { // Also masks::BRIDGE
+        if context_is_method { result.push("BRIDGE"); }
+        else { result.push("VOLATILE"); }
     }
 
-    if flags & 0x0080 != 0 {
-        if context_is_method {
-            result.push("VARARGS");
-        } else {
-            result.push("TRANSIENT");
-        }
+    if flags & masks::TRANSIENT != 0 { // Also masks::VARARGS
+        if context_is_method { result.push("VARARGS"); }
+        else { result.push("TRANSIENT"); }
     }
 
-    if flags & 0x0100 != 0 {
-        result.push("NATIVE");
-    }
-    if flags & 0x0200 != 0 {
-        result.push("INTERFACE");
-    }
-    if flags & 0x0400 != 0 {
-        result.push("ABSTRACT");
-    }
-    if flags & 0x0800 != 0 {
-        result.push("STRICTFP");
-    }
-    if flags & 0x1000 != 0 {
-        result.push("SYNTHETIC");
-    }
-    if flags & 0x2000 != 0 {
-        result.push("ANNOTATION");
-    }
-    if flags & 0x4000 != 0 {
-        result.push("ENUM");
-    }
-    if flags & 0x10000 != 0 {
-        result.push("CONSTRUCTOR");
-    }
-    if flags & 0x20000 != 0 {
-        result.push("DECLARED_SYNCHRONIZED");
-    }
+    // 4. Class Specific
+    if flags & masks::INTERFACE != 0 { result.push("INTERFACE"); }
+    if flags & masks::ANNOTATION != 0 { result.push("ANNOTATION"); }
+    if flags & masks::ENUM != 0 { result.push("ENUM"); }
+
+    // 5. Advanced / Internal
+    if flags & masks::STRICTFP != 0 { result.push("STRICTFP"); }
+    if flags & masks::SYNTHETIC != 0 { result.push("SYNTHETIC"); }
+    if flags & masks::CONSTRUCTOR != 0 { result.push("CONSTRUCTOR"); }
+    if flags & masks::DECLARED_SYNCHRONIZED != 0 { result.push("DECLARED_SYNCHRONIZED"); }
 
     if result.is_empty() {
         "".to_string()
     } else {
-        result.join(" ")
+        result.join(" | ")
     }
 }

@@ -9,8 +9,8 @@ pub struct RawFieldId {
 }
 
 #[derive(Clone, Serialize)]
-pub struct Field {
-    pub class: String,
-    pub type_name: String,
-    pub name: String,
+pub struct Field<'a> {
+    pub class: &'a str,
+    pub type_name: &'a str,
+    pub name: &'a str,
 }

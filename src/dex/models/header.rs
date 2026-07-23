@@ -1,7 +1,7 @@
 use scroll::Pread;
 use serde::Serialize;
 
-#[derive(Debug, Pread, Serialize)]
+#[derive(Debug, Pread, Serialize, Clone)]
 pub struct RawHeader {
     pub magic: [u8; 8],
     pub checksum: u32,

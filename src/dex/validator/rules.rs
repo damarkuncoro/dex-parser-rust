@@ -3,20 +3,21 @@ use crate::dex::models::map_list::types as map_types;
 use crate::dex::error::DexError;
 use crate::dex::utils::calculate_adler32;
 use crate::dex::parsers::map_list;
+use crate::dex::constants::dex::{MAGIC_PREFIX, SUPPORTED_VERSIONS};
 use super::ValidationRule;
 
 pub struct MagicRule;
 impl ValidationRule for MagicRule {
     fn validate(&self, _buffer: &[u8], header: &RawHeader) -> Result<(), DexError> {
         let magic = &header.magic;
-        if &magic[0..3] != b"dex" || magic[3] != b'\n' {
+        if &magic[0..4] != MAGIC_PREFIX {
             return Err(DexError::InvalidMagic);
         }
         let version = std::str::from_utf8(&magic[4..7]).map_err(|_| DexError::InvalidVersion("Invalid UTF-8".into()))?;
-        match version {
-            "035" | "037" | "038" | "039" => Ok(()),
-            _ => Err(DexError::InvalidVersion(version.to_string())),
+        if !SUPPORTED_VERSIONS.contains(&version) {
+            return Err(DexError::InvalidVersion(version.to_string()));
         }
+        Ok(())
     }
 }
 

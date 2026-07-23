@@ -1,37 +1,39 @@
 use crate::dex::models::{Class, Dex, EncodedField};
 use super::method::print_method;
+use std::io::Write;
 
-pub fn print_class(_dex: &Dex, index: usize, class: &Class) {
-    println!("\nClass #{:<12} -", index);
-    println!("  Class descriptor  : '{}'", class.name);
-    println!(
+pub fn print_class(_dex: &Dex, index: usize, class: &Class, writer: &mut dyn Write) -> std::io::Result<()> {
+    writeln!(writer, "\nClass #{:<12} -", index)?;
+    writeln!(writer, "  Class descriptor  : '{}'", class.name)?;
+    writeln!(
+        writer,
         "  Access flags      : 0x{:04x} ({})",
         class.access_flags, class.access_flags_text
-    );
-    println!("  Superclass        : '{}'", class.superclass);
+    )?;
+    writeln!(writer, "  Superclass        : '{}'", class.superclass)?;
 
-    println!("  Interfaces        -");
+    writeln!(writer, "  Interfaces        -")?;
     for (i, itf) in class.interfaces.iter().enumerate() {
-        println!("    #{:<14} : '{}'", i, itf);
+        writeln!(writer, "    #{:<14} : '{}'", i, itf)?;
     }
 
-    println!("  Static fields     -");
+    writeln!(writer, "  Static fields     -")?;
     for (f_idx, field) in class.static_fields.iter().enumerate() {
-        print_field(f_idx, field, &class.name);
+        print_field(f_idx, field, &class.name, writer)?;
     }
 
-    println!("  Instance fields   -");
+    writeln!(writer, "  Instance fields   -")?;
     for (f_idx, field) in class.instance_fields.iter().enumerate() {
-        print_field(f_idx, field, &class.name);
+        print_field(f_idx, field, &class.name, writer)?;
     }
 
-    println!("  Direct methods    -");
+    writeln!(writer, "  Direct methods    -")?;
     for (m_idx, method) in class.direct_methods.iter().enumerate() {
-        print_method(m_idx, method, &class.name);
+        print_method(m_idx, method, &class.name, writer)?;
     }
-    println!("  Virtual methods   -");
+    writeln!(writer, "  Virtual methods   -")?;
     for (m_idx, method) in class.virtual_methods.iter().enumerate() {
-        print_method(m_idx, method, &class.name);
+        print_method(m_idx, method, &class.name, writer)?;
     }
 
     let source_file = class
@@ -39,18 +41,22 @@ pub fn print_class(_dex: &Dex, index: usize, class: &Class) {
         .as_ref()
         .map(|s| format!("'{}'", s))
         .unwrap_or_else(|| "unknown".to_string());
-    println!(
+    writeln!(
+        writer,
         "  source_file_idx   : {} ({})",
         class.source_file_idx, source_file
-    );
+    )?;
+    Ok(())
 }
 
-pub fn print_field(idx: usize, field: &EncodedField, class_name: &str) {
-    println!("    #{:<14} : (in {})", idx, class_name);
-    println!("      name          : '{}'", field.name);
-    println!("      type          : '{}'", field.type_name);
-    println!(
+pub fn print_field(idx: usize, field: &EncodedField, class_name: &str, writer: &mut dyn Write) -> std::io::Result<()> {
+    writeln!(writer, "    #{:<14} : (in {})", idx, class_name)?;
+    writeln!(writer, "      name          : '{}'", field.name)?;
+    writeln!(writer, "      type          : '{}'", field.type_name)?;
+    writeln!(
+        writer,
         "      access        : 0x{:04x} ({})",
         field.access_flags, field.access_flags_text
-    );
+    )?;
+    Ok(())
 }

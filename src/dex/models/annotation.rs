@@ -2,33 +2,33 @@ use serde::Serialize;
 use super::encoded_value::EncodedAnnotation;
 
 #[derive(Serialize, Clone, Debug)]
-pub struct AnnotationsDirectory {
-    pub class_annotations: Vec<AnnotationItem>,
-    pub field_annotations: Vec<FieldAnnotation>,
-    pub method_annotations: Vec<MethodAnnotation>,
-    pub parameter_annotations: Vec<ParameterAnnotation>,
+pub struct AnnotationsDirectory<'a> {
+    pub class_annotations: Vec<AnnotationItem<'a>>,
+    pub field_annotations: Vec<FieldAnnotation<'a>>,
+    pub method_annotations: Vec<MethodAnnotation<'a>>,
+    pub parameter_annotations: Vec<ParameterAnnotation<'a>>,
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub struct AnnotationItem {
+pub struct AnnotationItem<'a> {
     pub visibility: u8,
-    pub annotation: EncodedAnnotation,
+    pub annotation: EncodedAnnotation<'a>,
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub struct FieldAnnotation {
+pub struct FieldAnnotation<'a> {
     pub field_idx: u32,
-    pub annotations: Vec<AnnotationItem>,
+    pub annotations: Vec<AnnotationItem<'a>>,
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub struct MethodAnnotation {
+pub struct MethodAnnotation<'a> {
     pub method_idx: u32,
-    pub annotations: Vec<AnnotationItem>,
+    pub annotations: Vec<AnnotationItem<'a>>,
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub struct ParameterAnnotation {
+pub struct ParameterAnnotation<'a> {
     pub method_idx: u32,
-    pub annotations: Vec<AnnotationItem>, // This is actually complex in DEX, but simplified for now
+    pub annotations_per_parameter: Vec<Vec<AnnotationItem<'a>>>,
 }
