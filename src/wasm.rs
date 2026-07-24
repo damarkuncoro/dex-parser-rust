@@ -18,7 +18,7 @@ pub struct WasmApkResult<'a> {
 static PARSED_APK: Lazy<Mutex<Option<WasmApkResult<'static>>>> = Lazy::new(|| Mutex::new(None));
 
 // Helper to send status to JS via worker postMessage
-fn send_status(msg: &str) {
+fn send_status(_msg: &str) {
     #[cfg(target_arch = "wasm32")]
     {
         use wasm_bindgen::JsValue;
@@ -27,7 +27,7 @@ fn send_status(msg: &str) {
             .and_then(|func| {
                 let msg_obj = js_sys::Object::new();
                 let _ = js_sys::Reflect::set(&msg_obj, &JsValue::from_str("type"), &JsValue::from_str("STATUS"));
-                let _ = js_sys::Reflect::set(&msg_obj, &JsValue::from_str("payload"), &JsValue::from_str(msg));
+                let _ = js_sys::Reflect::set(&msg_obj, &JsValue::from_str("payload"), &JsValue::from_str(_msg));
                 js_sys::Reflect::apply(&func.into(), &global, &js_sys::Array::of1(&msg_obj))
             });
     }
