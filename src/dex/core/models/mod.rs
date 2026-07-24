@@ -31,25 +31,26 @@ pub struct Dex<'a> {
     pub map_list: MapList,
     pub method_handles: Vec<raw::RawMethodHandleItem>,
     pub call_sites: Vec<raw::RawCallSiteIdItem>,
+    pub byte_gaps: Vec<(usize, usize)>,
 }
 
 #[derive(Serialize, Clone)]
 pub struct DexMetadata<'a> {
-    pub strings: Vec<&'a str>,
-    pub types: Vec<&'a str>,
+    pub strings: Vec<&'a [u8]>,
+    pub types: Vec<&'a [u8]>,
     pub protos: Vec<Proto<'a>>,
     pub fields: Vec<Field<'a>>,
     pub methods: Vec<String>,
 }
 
 impl<'a> StringResolver<'a> for DexMetadata<'a> {
-    fn resolve_string(&self, idx: u32) -> Option<&'a str> {
+    fn resolve_string(&self, idx: u32) -> Option<&'a [u8]> {
         self.strings.get(idx as usize).copied()
     }
 }
 
 impl<'a> TypeResolver<'a> for DexMetadata<'a> {
-    fn resolve_type(&self, idx: u32) -> Option<&'a str> {
+    fn resolve_type(&self, idx: u32) -> Option<&'a [u8]> {
         self.types.get(idx as usize).copied()
     }
 }

@@ -1,57 +1,53 @@
+use crate::dex::core::constants::sizes::CODE_ITEM_HEADER;
+use crate::dex::error::DexError;
+use crate::dex::core::instructions::decoder::InstructionDecoder;
+use crate::dex::core::models::{raw::RawCodeItem, Code};
+use crate::dex::parsers::traits::DexResolver;
+use crate::dex::parsers::debug_info;
+use scroll::Pread;
+
 pub mod catches;
 
-use crate::dex::constants::sizes::CODE_ITEM_HEADER;
-use crate::dex::error::DexError;
-use crate::dex::instructions::decoder::InstructionDecoder;
-use crate::dex::models::{raw::RawCodeItem, Code};
-use crate::dex::parsers::{debug_info, traits::DexResolver};
-use scroll::{Endian, Pread};
-use self::catches::parse_catches;
-
-pub fn parse<'a, R: DexResolver<'a>>(
-    buffer: &'a [u8],
+pub fn parse_code_item<'a, R: DexResolver<'a>>(
+    reader: &mut crate::dex::readers::DexReader<'a>,
     offset: usize,
     resolver: &R,
-    endian: Endian,
 ) -> Result<Code<'a>, DexError> {
-    let mut curr = offset;
-    let raw: RawCodeItem = buffer.pread_with(curr, endian).map_err(DexError::ScrollError)?;
-    curr += CODE_ITEM_HEADER;
+    reader.seek(offset)?;
+    let header: RawCodeItem = reader.read_bytes(CODE_ITEM_HEADER)?.pread_with(0, reader.endian()).map_err(DexError::ScrollError)?;
 
-    let decoder = InstructionDecoder::new(resolver);
     let mut instructions = Vec::new();
-    let insns_size_bytes = raw.insns_size as usize * 2;
-    let insns_end = curr + insns_size_bytes;
+    let insns_start = offset + CODE_ITEM_HEADER;
+    let decoder = InstructionDecoder::new(resolver);
 
-    let mut pc = curr;
-    while pc < insns_end && pc < buffer.len() {
-        let (ins, length) = decoder.decode(buffer, pc, curr, endian);
+    let mut pc = 0;
+    while pc < (header.insns_size as usize * 2) {
+        let (ins, len) = decoder.decode(reader.buffer(), insns_start + pc, insns_start, reader.endian());
+        // We need to mark instructions as used.
+        let _ = reader.read_bytes(len)?;
         instructions.push(ins);
-        pc += length;
+        pc += len;
     }
 
-    let catches = parse_catches(
-        buffer,
-        insns_end,
-        raw.insns_size,
-        raw.tries_size,
-        resolver,
-        endian,
-    )?;
+    let catches = if header.tries_size > 0 {
+        catches::parse_tries(reader, offset, header.tries_size, resolver)?
+    } else {
+        Vec::new()
+    };
 
-    let dbg_info = if raw.debug_info_off != 0 {
-        debug_info::parse(buffer, raw.debug_info_off as usize, resolver, endian).ok()
+    let debug_info = if header.debug_info_off != 0 {
+        Some(debug_info::parse_debug_info(reader, header.debug_info_off as usize, resolver)?)
     } else {
         None
     };
 
     Ok(Code {
-        registers_size: raw.registers_size,
-        ins_size: raw.ins_size,
-        outs_size: raw.outs_size,
-        insns_size: raw.insns_size,
+        registers_size: header.registers_size,
+        ins_size: header.ins_size,
+        outs_size: header.outs_size,
+        insns_size: header.insns_size,
         instructions,
         catches,
-        debug_info: dbg_info,
+        debug_info,
     })
 }

@@ -9,5 +9,5 @@ pub mod wasm;
 
 // Public API Re-exports
 pub use crate::dex::parsers::DexParser;
-pub use crate::dex::models::Dex;
+pub use crate::dex::core::models::Dex;
 pub use crate::dex::error::DexError;

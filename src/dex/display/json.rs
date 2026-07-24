@@ -1,4 +1,4 @@
-use crate::dex::models::Dex;
+use crate::dex::core::models::Dex;
 use super::DexPrinter;
 use std::io::Write;
 

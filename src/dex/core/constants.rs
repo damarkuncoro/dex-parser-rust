@@ -10,6 +10,7 @@ pub mod sizes {
     pub const METHOD_ID_ITEM: usize = 8;
     pub const CLASS_DEF_ITEM: usize = 32;
     pub const CODE_ITEM_HEADER: usize = 16;
+    pub const TRY_ITEM_SIZE: usize = 8;
 }
 
 /// Offset spesifik dalam Header
@@ -29,7 +30,8 @@ pub const REVERSE_ENDIAN_CONSTANT: u32 = 0x78563412;
 /// DEX Metadata
 pub mod dex {
     pub const MAGIC_PREFIX: &[u8; 4] = b"dex\n";
-    pub const SUPPORTED_VERSIONS: &[&str] = &["035", "037", "038", "039"];
+    pub const CDEX_MAGIC_PREFIX: &[u8; 4] = b"cdex";
+    pub const SUPPORTED_VERSIONS: &[&str] = &["035", "037", "038", "039", "041"];
 }
 
 /// Encoded Value Types
@@ -67,6 +69,8 @@ pub mod debug {
     pub const SET_EPILOGUE_BEGIN: u8 = 0x08;
     pub const SET_FILE: u8 = 0x09;
     pub const FIRST_SPECIAL: u8 = 0x0a;
+    pub const LINE_BASE: i32 = -4;
+    pub const LINE_RANGE: u8 = 15;
 }
 
 /// Access Flags Masks

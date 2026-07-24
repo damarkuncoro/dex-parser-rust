@@ -7,6 +7,7 @@ pub struct AnnotationsDirectory<'a> {
     pub field_annotations: Vec<FieldAnnotation<'a>>,
     pub method_annotations: Vec<MethodAnnotation<'a>>,
     pub parameter_annotations: Vec<ParameterAnnotation<'a>>,
+    #[serde(skip)] pub _marker: std::marker::PhantomData<&'a ()>,
 }
 
 #[derive(Serialize,  Clone, Debug)]

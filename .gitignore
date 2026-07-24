@@ -3,3 +3,6 @@
 Cargo.lock
 .idea
 *.rs.bk
+result.txt
+output.txt
+test_result.json

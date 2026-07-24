@@ -1,11 +1,11 @@
-use crate::dex::models::Field;
+use crate::dex::core::models::Field;
 
 pub trait StringResolver<'a> {
-    fn resolve_string(&self, idx: u32) -> Option<&'a str>;
+    fn resolve_string(&self, idx: u32) -> Option<&'a [u8]>;
 }
 
 pub trait TypeResolver<'a> {
-    fn resolve_type(&self, idx: u32) -> Option<&'a str>;
+    fn resolve_type(&self, idx: u32) -> Option<&'a [u8]>;
 }
 
 pub trait MethodResolver {
@@ -19,20 +19,20 @@ pub trait FieldResolver<'a> {
 pub trait DexResolver<'a>: StringResolver<'a> + TypeResolver<'a> + MethodResolver + FieldResolver<'a> {}
 
 pub struct SimpleResolver<'a> {
-    pub strings: Vec<&'a str>,
-    pub types: Vec<&'a str>,
+    pub strings: Vec<&'a [u8]>,
+    pub types: Vec<&'a [u8]>,
     pub methods: Vec<String>,
     pub fields: Vec<Field<'a>>,
 }
 
 impl<'a> StringResolver<'a> for SimpleResolver<'a> {
-    fn resolve_string(&self, idx: u32) -> Option<&'a str> {
+    fn resolve_string(&self, idx: u32) -> Option<&'a [u8]> {
         self.strings.get(idx as usize).copied()
     }
 }
 
 impl<'a> TypeResolver<'a> for SimpleResolver<'a> {
-    fn resolve_type(&self, idx: u32) -> Option<&'a str> {
+    fn resolve_type(&self, idx: u32) -> Option<&'a [u8]> {
         self.types.get(idx as usize).copied()
     }
 }

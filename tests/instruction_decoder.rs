@@ -1,14 +1,14 @@
-use dex_parser_rust::dex::instructions::InstructionDecoder;
-use dex_parser_rust::dex::models::Field;
+use dex_parser_rust::dex::core::instructions::InstructionDecoder;
+use dex_parser_rust::dex::core::models::Field;
 use dex_parser_rust::dex::parsers::traits::*;
 use scroll::Endian;
 
 struct MockResolver;
 
 impl<'a> StringResolver<'a> for MockResolver {
-    fn resolve_string(&self, idx: u32) -> Option<&'a str> {
+    fn resolve_string(&self, idx: u32) -> Option<&'a [u8]> {
         if idx == 1 {
-            Some("HelloRust")
+            Some(b"HelloRust")
         } else {
             None
         }
@@ -16,9 +16,9 @@ impl<'a> StringResolver<'a> for MockResolver {
 }
 
 impl<'a> TypeResolver<'a> for MockResolver {
-    fn resolve_type(&self, idx: u32) -> Option<&'a str> {
+    fn resolve_type(&self, idx: u32) -> Option<&'a [u8]> {
         if idx == 2 {
-            Some("Ljava/lang/String;")
+            Some(b"Ljava/lang/String;")
         } else {
             None
         }
@@ -39,9 +39,10 @@ impl<'a> FieldResolver<'a> for MockResolver {
     fn resolve_field(&self, idx: u32) -> Option<Field<'a>> {
         if idx == 4 {
             Some(Field {
-                class: "Ljava/lang/System;",
-                name: "out",
-                type_name: "Ljava/io/PrintStream;",
+                class: "Ljava/lang/System;".to_string(),
+                name: "out".to_string(),
+                type_name: "Ljava/io/PrintStream;".to_string(),
+                _marker: std::marker::PhantomData,
             })
         } else {
             None

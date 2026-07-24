@@ -1,7 +1,7 @@
 pub mod json;
 pub mod text;
 
-use crate::dex::models::Dex;
+use crate::dex::core::models::Dex;
 use std::io::Write;
 
 /// Trait for defining different output strategies for the parsed DEX data.

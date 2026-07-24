@@ -1,45 +1,41 @@
 use crate::dex::error::DexError;
-use crate::dex::models::{EncodedMethod};
-use crate::dex::models::raw::RawMethodId;
+use crate::dex::core::models::{EncodedMethod};
+use crate::dex::core::models::raw::RawMethodId;
 use crate::dex::parsers::{class_data, code, traits::DexResolver};
-use crate::dex::utils::access_flags::translate_access_flags;
-use scroll::Endian;
+use crate::dex::core::utils::access_flags::translate_access_flags;
+use crate::trace_parse;
 
-pub fn link_methods<'a, R: DexResolver<'a>>(
-    buffer: &'a [u8],
-    raw_methods: &[class_data::RawEncodedMethod],
-    raw_method_ids: &[RawMethodId],
-    strings: &[&'a str],
-    methods_sigs: &[String],
+pub fn link_methods<'a, R: DexResolver<'a> + Sync + Send>(
+    reader: &mut crate::dex::readers::DexReader<'a>,
+    class_data_methods: &[class_data::RawEncodedMethod],
+    methods_display: &[String],
+    raw_methods: &[RawMethodId],
     resolver: &R,
-    endian: Endian,
 ) -> Result<Vec<EncodedMethod<'a>>, DexError> {
-    let mut last_idx = 0u64;
-    let mut methods = Vec::with_capacity(raw_methods.len());
-    for raw in raw_methods {
-        let method_idx = (last_idx + raw.method_idx_diff) as usize;
-        last_idx = method_idx as u64;
+    let mut result = Vec::with_capacity(class_data_methods.len());
 
-        let raw_mid = raw_method_ids.get(method_idx).ok_or_else(|| {
-            DexError::InvalidIndex(format!("Method index {}", method_idx))
-        })?;
-        let name = strings.get(raw_mid.name_idx as usize).copied().unwrap_or("<invalid>");
-        let signature = methods_sigs.get(method_idx).cloned().unwrap_or_default();
+    for m in class_data_methods {
+        let signature = &methods_display[m.method_idx as usize];
+        let raw = &raw_methods[m.method_idx as usize];
+        let name = resolver.resolve_string(raw.name_idx).map(|b| format!("{}", crate::dex::core::utils::mutf8::Mutf8Display(b))).unwrap_or_else(|| "unknown".to_string());
 
-        let code = if raw.code_off != 0 {
-            Some(code::parse(buffer, raw.code_off as usize, resolver, endian)?)
+        trace_parse!("  [MethodLinker] Linking: {}, CodeOff: 0x{:x}", signature, m.code_off);
+
+        let code = if m.code_off != 0 {
+            Some(code::parse_code_item(reader, m.code_off as usize, resolver)?)
         } else {
             None
         };
 
-        methods.push(EncodedMethod {
+        result.push(EncodedMethod {
             name,
-            signature,
-            access_flags: raw.access_flags as u32,
-            access_flags_text: translate_access_flags(raw.access_flags as u32, true),
-            code_off: raw.code_off as u32,
+            signature: signature.clone(),
+            access_flags: m.access_flags,
+            access_flags_text: translate_access_flags(m.access_flags, true),
+            code_off: m.code_off,
             code,
         });
     }
-    Ok(methods)
+
+    Ok(result)
 }

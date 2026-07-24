@@ -36,11 +36,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             if let Err(e) = printer.print(dex, &format!("{} [DEX #{}]", args.path, i), &mut stdout) {
                 if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }
+                eprintln!("Error printing DEX #{}: {}", i, e);
                 return Err(e.into());
             }
         }
     } else {
-        let dex = DexParser::parse(&buffer)?;
+        let dex = DexParser::parse(&buffer).map_err(|e| {
+            eprintln!("Error parsing {}: {}", args.path, e);
+            e
+        })?;
         if let Err(e) = printer.print(&dex, &args.path, &mut stdout) {
             if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }
             return Err(e.into());

@@ -26,8 +26,8 @@ pub enum DexError {
     #[error("Unexpected end of file")]
     UnexpectedEOF,
 
-    #[error("Malformed ULEB128 encoding")]
-    MalformedULEB128,
+    #[error("Malformed ULEB128 encoding at offset {0}")]
+    MalformedULEB128(usize),
 
     #[error("Parsing error: {0}")]
     ScrollError(#[from] scroll::Error),

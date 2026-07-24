@@ -1,57 +1,40 @@
-pub mod handlers;
-
-use crate::dex::error::DexError;
-use crate::dex::models::{DebugInfo};
+use crate::dex::core::models::{DebugInfo};
 use crate::dex::parsers::traits::DexResolver;
 use crate::dex::readers::DexReader;
+use crate::trace_parse;
 
-pub fn parse<'a, R: DexResolver<'a>>(
-    buffer: &'a [u8],
+pub mod handlers;
+
+pub fn parse_debug_info<'a, R: DexResolver<'a>>(
+    reader: &mut DexReader<'a>,
     offset: usize,
     resolver: &R,
-    endian: scroll::Endian,
-) -> Result<DebugInfo<'a>, DexError> {
-    let mut reader = DexReader::new(buffer, endian);
+) -> Result<DebugInfo<'a>, crate::dex::error::DexError> {
     reader.seek(offset)?;
 
-    let line_start = reader.read_uleb128()?;
-    let parameters_size = reader.read_uleb128()?;
+    trace_parse!("    [DebugInfo] Parsing at offset 0x{:x}", offset);
 
+    let line_start = reader.read_uleb128()? as u32;
+    let parameters_size = reader.read_uleb128()? as u32;
     let mut parameters = Vec::with_capacity(parameters_size as usize);
+
+    trace_parse!("      LineStart: {}, Params: {}", line_start, parameters_size);
+
     for _ in 0..parameters_size {
         let name_idx_plus_1 = reader.read_uleb128()?;
         if name_idx_plus_1 == 0 {
             parameters.push(None);
         } else {
-            parameters.push(resolver.resolve_string((name_idx_plus_1 - 1) as u32));
+            parameters.push(resolver.resolve_string((name_idx_plus_1 - 1) as u32).map(|b| format!("{}", crate::dex::core::utils::mutf8::Mutf8Display(b))));
         }
     }
 
-    let mut entries = Vec::new();
-    let mut current_address: u32 = 0;
-    let mut current_line: u32 = line_start as u32;
-
-    loop {
-        let opcode = match reader.read_u8() {
-            Ok(op) => op,
-            Err(_) => break, // EOF reached
-        };
-
-        if !handlers::handle_opcode(
-            opcode,
-            &mut reader,
-            resolver,
-            &mut current_address,
-            &mut current_line,
-            &mut entries,
-        )? {
-            break;
-        }
-    }
+    let entries = handlers::parse_debug_entries(reader, resolver)?;
 
     Ok(DebugInfo {
-        line_start: line_start as u32,
+        line_start,
         parameters,
         entries,
+        _marker: std::marker::PhantomData,
     })
 }

@@ -1,6 +1,6 @@
 pub mod rules;
 
-use crate::dex::models::header::RawHeader;
+use crate::dex::core::models::header::RawHeader;
 use crate::dex::error::DexError;
 use self::rules::{MagicRule, ChecksumRule, OffsetBoundsRule};
 

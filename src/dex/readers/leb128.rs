@@ -14,7 +14,7 @@ pub fn read_uleb128(buffer: &[u8], mut offset: usize) -> Result<(u64, usize), De
         count += 1;
 
         if shift >= 64 {
-            return Err(DexError::MalformedULEB128);
+            return Err(DexError::MalformedULEB128(offset - count));
         }
 
         result |= ((byte & 0x7f) as u64) << shift;
@@ -41,7 +41,7 @@ pub fn read_sleb128(buffer: &[u8], mut offset: usize) -> Result<(i64, usize), De
         count += 1;
 
         if shift >= 64 {
-            return Err(DexError::MalformedULEB128);
+            return Err(DexError::MalformedULEB128(offset - count));
         }
 
         result |= ((byte & 0x7f) as i64) << shift;

@@ -2,7 +2,7 @@ use std::io::{Read, Cursor};
 use zip::ZipArchive;
 use crate::dex::error::DexError;
 use crate::dex::parsers::DexParser;
-use crate::dex::models::Apk;
+use crate::dex::core::models::Apk;
 
 pub struct ApkParser;
 
@@ -27,7 +27,10 @@ impl ApkParser {
             // To maintain Zero-copy across the app, we need the buffer to live long enough.
             // For APK extraction, we leak the individual DEX buffers into the heap.
             let leaked_buffer: &'static [u8] = Box::leak(dex_buffer.into_boxed_slice());
-            let dex = DexParser::parse(leaked_buffer)?;
+            let dex = DexParser::parse(leaked_buffer).map_err(|e| {
+                eprintln!("Error parsing {} inside APK: {}", name, e);
+                e
+            })?;
             dex_files.push(dex);
         }
 

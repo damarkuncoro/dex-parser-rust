@@ -1,6 +1,6 @@
 use scroll::{Endian, Pread};
 use crate::dex::error::DexError;
-use crate::dex::models::{MapList, MapItem};
+use crate::dex::core::models::{MapList, MapItem};
 
 pub fn parse(buffer: &[u8], offset: usize, endian: Endian) -> Result<MapList, DexError> {
     if offset == 0 {

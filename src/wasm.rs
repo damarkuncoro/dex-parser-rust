@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 use crate::dex::parsers::DexParser;
-use crate::dex::models::{Dex, Apk};
+use crate::dex::core::models::{Dex, Apk};
 use std::sync::Mutex;
 use once_cell::sync::Lazy;
 use serde::Serialize;
@@ -12,6 +12,21 @@ use zip::ZipArchive;
 pub struct WasmApkResult<'a> {
     pub dex_files: Vec<Dex<'a>>,
     pub class_lookup: std::collections::HashMap<String, usize>,
+}
+
+#[derive(Serialize)]
+pub struct DexSummary {
+    pub name: String,
+    pub magic: String,
+    pub class_count: usize,
+    pub gap_count: usize,
+    pub total_gap_size: usize,
+}
+
+#[derive(Serialize)]
+pub struct WasmLoadResult {
+    pub summaries: Vec<DexSummary>,
+    pub class_names: Vec<Vec<String>>,
 }
 
 // Global state to hold parsed DEX files in WASM memory
@@ -44,6 +59,7 @@ pub fn load_apk_wasm(buffer: &[u8]) -> Result<JsValue, JsValue> {
     let leaked_buffer: &'static [u8] = Box::leak(owned_buffer);
 
     let mut dex_files = Vec::new();
+    let mut names = Vec::new();
 
     if leaked_buffer.starts_with(b"PK\x03\x04") {
         send_status("Engine: APK detected, opening archive...");
@@ -65,34 +81,40 @@ pub fn load_apk_wasm(buffer: &[u8]) -> Result<JsValue, JsValue> {
             let leaked_dex: &'static [u8] = Box::leak(dex_buffer.into_boxed_slice());
             let dex = DexParser::parse(leaked_dex).map_err(|e| JsValue::from_str(&e.to_string()))?;
             dex_files.push(dex);
+            names.push(name);
         }
     } else {
         send_status("Engine: Single DEX detected, parsing...");
         let dex = DexParser::parse(leaked_buffer).map_err(|e| JsValue::from_str(&e.to_string()))?;
         dex_files.push(dex);
+        names.push("classes.dex".to_string());
     };
 
-    if dex_files.is_empty() {
-        return Err(JsValue::from_str("No DEX files found"));
+    let mut summaries = Vec::new();
+    for (i, dex) in dex_files.iter().enumerate() {
+        summaries.push(DexSummary {
+            name: names[i].clone(),
+            magic: String::from_utf8_lossy(&dex.header.magic).to_string(),
+            class_count: dex.class_defs.len(),
+            gap_count: dex.byte_gaps.len(),
+            total_gap_size: dex.byte_gaps.iter().map(|g| g.1).sum(),
+        });
     }
 
-    send_status("Engine: Linking global context...");
-    let apk = Apk::new(dex_files);
+    let class_names: Vec<Vec<String>> = dex_files.iter()
+        .map(|dex| dex.class_defs.iter().map(|c| c.name.to_string()).collect())
+        .collect();
 
+    let apk = Apk::new(dex_files);
     let result = WasmApkResult {
         dex_files: unsafe { std::mem::transmute::<Vec<Dex<'_>>, Vec<Dex<'static>>>(apk.dex_files) },
         class_lookup: apk.class_lookup,
     };
 
-    send_status("Engine: Generating class metadata...");
-    let metadata: Vec<Vec<String>> = result.dex_files.iter()
-        .map(|dex| dex.class_defs.iter().map(|c| c.name.to_string()).collect())
-        .collect();
-
     *storage = Some(result);
     send_status("Engine: Analysis complete.");
 
-    Ok(serde_wasm_bindgen::to_value(&metadata).unwrap())
+    Ok(serde_wasm_bindgen::to_value(&WasmLoadResult { summaries, class_names }).unwrap())
 }
 
 #[wasm_bindgen]

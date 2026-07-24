@@ -1,16 +1,6 @@
 use crate::dex::error::DexError;
 use crate::dex::readers::DexReader;
-
-pub struct RawEncodedField {
-    pub field_idx_diff: u64,
-    pub access_flags: u64,
-}
-
-pub struct RawEncodedMethod {
-    pub method_idx_diff: u64,
-    pub access_flags: u64,
-    pub code_off: u64,
-}
+use crate::trace_parse;
 
 pub struct RawClassData {
     pub static_fields: Vec<RawEncodedField>,
@@ -19,51 +9,71 @@ pub struct RawClassData {
     pub virtual_methods: Vec<RawEncodedMethod>,
 }
 
-pub struct ClassDataParser;
+pub struct RawEncodedField {
+    pub field_idx: u32,
+    pub access_flags: u32,
+}
 
-impl ClassDataParser {
-    pub fn parse(reader: &mut DexReader, offset: u32) -> Result<RawClassData, DexError> {
-        if offset == 0 {
-            return Ok(RawClassData {
-                static_fields: Vec::new(), instance_fields: Vec::new(),
-                direct_methods: Vec::new(), virtual_methods: Vec::new(),
-            });
-        }
-        reader.seek(offset as usize)?;
+pub struct RawEncodedMethod {
+    pub method_idx: u32,
+    pub access_flags: u32,
+    pub code_off: u32,
+}
 
-        let static_fields_size = reader.read_uleb128()?;
-        let instance_fields_size = reader.read_uleb128()?;
-        let direct_methods_size = reader.read_uleb128()?;
-        let virtual_methods_size = reader.read_uleb128()?;
+pub fn parse_class_data(reader: &mut DexReader, offset: usize) -> Result<RawClassData, DexError> {
+    reader.seek(offset)?;
 
-        Ok(RawClassData {
-            static_fields: Self::read_fields(reader, static_fields_size as usize)?,
-            instance_fields: Self::read_fields(reader, instance_fields_size as usize)?,
-            direct_methods: Self::read_methods(reader, direct_methods_size as usize)?,
-            virtual_methods: Self::read_methods(reader, virtual_methods_size as usize)?,
-        })
+    trace_parse!("[ClassData] Parsing at offset: 0x{:08x}", offset);
+
+    let static_fields_size = reader.read_uleb128()? as usize;
+    let instance_fields_size = reader.read_uleb128()? as usize;
+    let direct_methods_size = reader.read_uleb128()? as usize;
+    let virtual_methods_size = reader.read_uleb128()? as usize;
+
+    trace_parse!("  [ClassData] Static: {}, Instance: {}, Direct: {}, Virtual: {}",
+        static_fields_size, instance_fields_size, direct_methods_size, virtual_methods_size);
+
+    let mut static_fields = Vec::with_capacity(static_fields_size);
+    let mut last_idx = 0;
+    for _i in 0..static_fields_size {
+        let diff = reader.read_uleb128()? as u32;
+        last_idx += diff;
+        let flags = reader.read_uleb128()? as u32;
+        trace_parse!("    [Static Field #{}] Offset: 0x{:08x}, Idx: {}", _i, reader.position(), last_idx);
+        static_fields.push(RawEncodedField { field_idx: last_idx, access_flags: flags });
     }
 
-    fn read_fields(reader: &mut DexReader, size: usize) -> Result<Vec<RawEncodedField>, DexError> {
-        let mut fields = Vec::with_capacity(size);
-        for _ in 0..size {
-            fields.push(RawEncodedField {
-                field_idx_diff: reader.read_uleb128()?,
-                access_flags: reader.read_uleb128()?,
-            });
-        }
-        Ok(fields)
+    let mut instance_fields = Vec::with_capacity(instance_fields_size);
+    last_idx = 0;
+    for _i in 0..instance_fields_size {
+        let diff = reader.read_uleb128()? as u32;
+        last_idx += diff;
+        let flags = reader.read_uleb128()? as u32;
+        trace_parse!("    [Instance Field #{}] Offset: 0x{:08x}, Idx: {}", _i, reader.position(), last_idx);
+        instance_fields.push(RawEncodedField { field_idx: last_idx, access_flags: flags });
     }
 
-    fn read_methods(reader: &mut DexReader, size: usize) -> Result<Vec<RawEncodedMethod>, DexError> {
-        let mut methods = Vec::with_capacity(size);
-        for _ in 0..size {
-            methods.push(RawEncodedMethod {
-                method_idx_diff: reader.read_uleb128()?,
-                access_flags: reader.read_uleb128()?,
-                code_off: reader.read_uleb128()?,
-            });
-        }
-        Ok(methods)
+    let mut direct_methods = Vec::with_capacity(direct_methods_size);
+    last_idx = 0;
+    for _i in 0..direct_methods_size {
+        let diff = reader.read_uleb128()? as u32;
+        last_idx += diff;
+        let flags = reader.read_uleb128()? as u32;
+        let code_off = reader.read_uleb128()? as u32;
+        trace_parse!("    [Direct Method #{}] Offset: 0x{:08x}, Idx: {}, Code: 0x{:x}", _i, reader.position(), last_idx, code_off);
+        direct_methods.push(RawEncodedMethod { method_idx: last_idx, access_flags: flags, code_off });
     }
+
+    let mut virtual_methods = Vec::with_capacity(virtual_methods_size);
+    last_idx = 0;
+    for _i in 0..virtual_methods_size {
+        let diff = reader.read_uleb128()? as u32;
+        last_idx += diff;
+        let flags = reader.read_uleb128()? as u32;
+        let code_off = reader.read_uleb128()? as u32;
+        trace_parse!("    [Virtual Method #{}] Offset: 0x{:08x}, Idx: {}, Code: 0x{:x}", _i, reader.position(), last_idx, code_off);
+        virtual_methods.push(RawEncodedMethod { method_idx: last_idx, access_flags: flags, code_off });
+    }
+
+    Ok(RawClassData { static_fields, instance_fields, direct_methods, virtual_methods })
 }

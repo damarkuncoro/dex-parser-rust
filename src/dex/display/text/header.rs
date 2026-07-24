@@ -1,4 +1,4 @@
-use crate::dex::models::Dex;
+use crate::dex::core::models::Dex;
 use std::io::Write;
 
 pub fn print_header(dex: &Dex, writer: &mut dyn Write) -> std::io::Result<()> {

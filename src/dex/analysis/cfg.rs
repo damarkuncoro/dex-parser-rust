@@ -1,4 +1,4 @@
-use crate::dex::models::Instruction;
+use crate::dex::core::models::Instruction;
 use serde::Serialize;
 use std::collections::HashSet;
 

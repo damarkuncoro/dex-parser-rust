@@ -1,9 +1,9 @@
-use crate::dex::models::header::RawHeader;
-use crate::dex::models::map_list::types as map_types;
+use crate::dex::core::models::header::RawHeader;
+use crate::dex::core::models::map_list::types as map_types;
 use crate::dex::error::DexError;
-use crate::dex::utils::calculate_adler32;
+use crate::dex::core::utils::calculate_adler32;
 use crate::dex::parsers::map_list;
-use crate::dex::constants::dex::{MAGIC_PREFIX, SUPPORTED_VERSIONS};
+use crate::dex::core::constants::dex::{MAGIC_PREFIX, SUPPORTED_VERSIONS};
 use super::ValidationRule;
 
 pub struct MagicRule;

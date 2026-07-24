@@ -3,7 +3,7 @@ use super::class::Code;
 
 #[derive(Serialize)]
 pub struct EncodedMethod<'a> {
-    pub name: &'a str,
+    pub name: String,
     pub signature: String,
     pub access_flags: u32,
     pub access_flags_text: String,

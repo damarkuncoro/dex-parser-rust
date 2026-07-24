@@ -1,5 +1,5 @@
 use crate::dex::error::DexError;
-use crate::dex::models::raw::RawFieldId;
+use crate::dex::core::models::raw::RawFieldId;
 use crate::dex::readers::DexReader;
 use scroll::Pread;
 

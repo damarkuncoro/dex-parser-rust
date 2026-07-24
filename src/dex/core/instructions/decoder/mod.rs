@@ -1,6 +1,7 @@
-use crate::dex::instructions::opcodes::{IndexType, OpcodeTable};
-use crate::dex::models::Instruction;
+use crate::dex::core::instructions::opcodes::{IndexType, OpcodeTable};
+use crate::dex::core::models::Instruction;
 use crate::dex::parsers::traits::DexResolver;
+use crate::dex::core::utils::mutf8::Mutf8Display;
 use scroll::{Endian, Pread};
 use std::marker::PhantomData;
 
@@ -124,10 +125,10 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
 
                 let resolved = match info.index_type {
                     IndexType::String => self.resolver.resolve_string(index)
-                        .map(|s| format!("\"{}\"", s))
+                        .map(|b| format!("\"{}\"", Mutf8Display(b)))
                         .unwrap_or_else(|| format!("string@{:04x}", index)),
                     IndexType::Type => self.resolver.resolve_type(index)
-                        .map(|s| s.to_string())
+                        .map(|b| format!("{}", Mutf8Display(b)))
                         .unwrap_or_else(|| format!("type@{:04x}", index)),
                     IndexType::Method => self.resolver.resolve_method(index)
                         .unwrap_or_else(|| format!("meth@{:04x}", index)),

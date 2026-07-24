@@ -1,4 +1,4 @@
-use crate::dex::constants::access_flags as masks;
+use crate::dex::core::constants::access_flags as masks;
 
 pub fn translate_access_flags(flags: u32, context_is_method: bool) -> String {
     let mut result = Vec::new();

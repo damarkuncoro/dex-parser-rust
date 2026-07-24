@@ -80,6 +80,15 @@ print(f"Total classes: {count}")
 
 ---
 
+## ⏱️ Performance & Output
+
+`dex-parser-rust` is designed for extreme speed and human clarity. 
+
+- **Performance**: Throughput of **~100 MB/s** and **1.8x faster** than official SDK tools. See [Benchmark Report](./docs/BENCHMARKS.md).
+- **Readability**: Offers "Smali-Lite" output with resolved symbols and labels. See [Output Comparison](./docs/OUTPUT_COMPARISON.md).
+
+---
+
 ## 📖 Documentation
 
 - [**Software Architecture Description (SAD)**](./docs/ARCHITECTURE.md): ISO/IEC/IEEE 42010:2011 compliant document detailing the system's design.
@@ -88,12 +97,14 @@ print(f"Total classes: {count}")
 
 ## 📂 Project Structure
 
-- `src/dex/readers`: Low-level binary stream management.
-- `src/dex/parsers`: Atomic units for each DEX section.
-- `src/dex/linker`: Central hub for logical symbol resolution.
-- `src/dex/models`: Separation of physical (Raw) and high-level logical models.
-- `src/dex/display`: Strategy-based formatters (Text/JSON).
-- `src/ffi.rs`: Foreign Function Interface exports.
+- `src/dex/readers`: Low-level binary stream management (LEB128, Endianness).
+- `src/dex/parsers`: Atomic units for each DEX section (Header, Strings, Annotations, Code, etc.).
+- `src/dex/models`: Physical (Raw) and high-level logical data structures.
+- `src/dex/linker`: Central intelligence hub for logical symbol and reference resolution.
+- `src/dex/analysis`: Intelligence layer for semantic conclusions (XREF, CFG).
+- `src/dex/display`: Strategy-based formatters for human and machine output (Text/JSON).
+- `src/ffi.rs` & `src/wasm.rs`: Cross-language bridges for C-ABI, Python, and WebAssembly.
+- `workspace/wasm`: Full-stack Web Sandbox using the WASM engine.
 
 ---
 

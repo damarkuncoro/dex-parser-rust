@@ -6,13 +6,13 @@ use super::encoded_value::EncodedValue;
 #[derive(Serialize)]
 pub struct Class<'a> {
     pub class_idx: u32,
-    pub name: &'a str,
+    pub name: String,
     pub access_flags: u32,
     pub access_flags_text: String,
-    pub superclass: &'a str,
-    pub interfaces: Vec<&'a str>,
+    pub superclass: String,
+    pub interfaces: Vec<String>,
     pub source_file_idx: i32,
-    pub source_file: Option<&'a str>,
+    pub source_file: Option<String>,
     pub static_fields: Vec<EncodedField<'a>>,
     pub instance_fields: Vec<EncodedField<'a>>,
     pub direct_methods: Vec<EncodedMethod<'a>>,
@@ -23,10 +23,11 @@ pub struct Class<'a> {
 
 #[derive(Serialize)]
 pub struct EncodedField<'a> {
-    pub name: &'a str,
-    pub type_name: &'a str,
+    pub name: String,
+    pub type_name: String,
     pub access_flags: u32,
     pub access_flags_text: String,
+    #[serde(skip)] pub _marker: std::marker::PhantomData<&'a ()>,
 }
 
 #[derive(Serialize)]
@@ -49,8 +50,9 @@ pub struct CatchHandler<'a> {
 
 #[derive(Serialize)]
 pub struct TryHandler<'a> {
-    pub type_name: &'a str,
+    pub type_name: String,
     pub addr: u32,
+    #[serde(skip)] pub _marker: std::marker::PhantomData<&'a ()>,
 }
 
 #[derive(Serialize)]
@@ -59,22 +61,29 @@ pub struct Instruction {
     pub opcode: u8,
     pub name: String,
     pub description: String,
-    // Structured reference data
     pub index: Option<u32>,
     pub resolved_value: Option<String>,
 }
 
-#[derive(Serialize,  Clone, Debug)]
+#[derive(Serialize, Clone, Debug)]
 pub struct DebugInfo<'a> {
     pub line_start: u32,
-    pub parameters: Vec<Option<&'a str>>,
+    pub parameters: Vec<Option<String>>,
     pub entries: Vec<DebugEntry<'a>>,
+    #[serde(skip)] pub _marker: std::marker::PhantomData<&'a ()>,
 }
 
-#[derive(Serialize,  Clone, Debug)]
+#[derive(Serialize, Clone, Debug)]
 pub enum DebugEntry<'a> {
-    LineNumber { address_diff: u32, line_diff: i32 },
-    StartLocal { address_diff: u32, name: &'a str, type_name: &'a str },
-    EndLocal { address_diff: u32 },
-    RestartLocal { address_diff: u32 },
+    AdvancePc { addr_diff: u32 },
+    AdvanceLine { line_diff: i32 },
+    StartLocal { register_num: u32, name: String, type_name: String },
+    StartLocalExtended { register_num: u32, name: String, type_name: String, signature: String },
+    EndLocal { register_num: u32 },
+    RestartLocal { register_num: u32 },
+    SetPrologueEnd,
+    SetEpilogueBegin,
+    SetFile { name: String },
+    SpecialOpcode { opcode: u8, line_diff: i32, addr_diff: u32 },
+    #[serde(skip)] _Marker(std::marker::PhantomData<&'a ()>),
 }

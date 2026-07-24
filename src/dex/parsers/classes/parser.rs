@@ -1,6 +1,6 @@
-use crate::dex::constants::sizes::CLASS_DEF_ITEM;
+use crate::dex::core::constants::sizes::CLASS_DEF_ITEM;
 use crate::dex::error::DexError;
-use crate::dex::models::raw::RawClassDef;
+use crate::dex::core::models::raw::RawClassDef;
 use crate::dex::readers::DexReader;
 use scroll::Pread;
 
