@@ -9,8 +9,8 @@ impl ByteTracker {
 
     pub fn mark(&mut self, offset: usize, length: usize) {
         let end = (offset + length).min(self.usage.len());
-        for i in offset..end {
-            self.usage[i] = true;
+        if offset < end {
+            self.usage[offset..end].fill(true);
         }
     }
 

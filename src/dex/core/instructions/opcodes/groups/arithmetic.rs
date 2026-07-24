@@ -1,0 +1,140 @@
+use super::super::IndexType;
+use super::OpcodeData;
+
+pub fn get(opcode: u8) -> Option<OpcodeData> {
+    match opcode {
+        0x7b..=0x8f => Some(get_unary(opcode)),
+        0x90..=0xaf => Some(get_binop(opcode)),
+        0xb0..=0xcf => Some(get_binop_2addr(opcode)),
+        0xd0..=0xff => Some(get_binop_lit(opcode)),
+        _ => None,
+    }
+}
+
+fn get_unary(opcode: u8) -> OpcodeData {
+    match opcode {
+        0x7b => ("neg-int", "vA, vB", 1, IndexType::None),
+        0x7c => ("not-int", "vA, vB", 1, IndexType::None),
+        0x7d => ("neg-long", "vA, vB", 1, IndexType::None),
+        0x7e => ("not-long", "vA, vB", 1, IndexType::None),
+        0x7f => ("neg-float", "vA, vB", 1, IndexType::None),
+        0x80 => ("neg-double", "vA, vB", 1, IndexType::None),
+        0x81 => ("int-to-long", "vA, vB", 1, IndexType::None),
+        0x82 => ("int-to-float", "vA, vB", 1, IndexType::None),
+        0x83 => ("int-to-double", "vA, vB", 1, IndexType::None),
+        0x84 => ("long-to-int", "vA, vB", 1, IndexType::None),
+        0x85 => ("long-to-float", "vA, vB", 1, IndexType::None),
+        0x86 => ("long-to-double", "vA, vB", 1, IndexType::None),
+        0x87 => ("float-to-int", "vA, vB", 1, IndexType::None),
+        0x88 => ("float-to-long", "vA, vB", 1, IndexType::None),
+        0x89 => ("float-to-double", "vA, vB", 1, IndexType::None),
+        0x8a => ("double-to-int", "vA, vB", 1, IndexType::None),
+        0x8b => ("double-to-long", "vA, vB", 1, IndexType::None),
+        0x8c => ("double-to-float", "vA, vB", 1, IndexType::None),
+        0x8d => ("int-to-byte", "vA, vB", 1, IndexType::None),
+        0x8e => ("int-to-char", "vA, vB", 1, IndexType::None),
+        0x8f => ("int-to-short", "vA, vB", 1, IndexType::None),
+        _ => ("unknown", "...", 1, IndexType::None),
+    }
+}
+
+fn get_binop(opcode: u8) -> OpcodeData {
+    match opcode {
+        0x90 => ("add-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x91 => ("sub-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x92 => ("mul-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x93 => ("div-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x94 => ("rem-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x95 => ("and-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x96 => ("or-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x97 => ("xor-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x98 => ("shl-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x99 => ("shr-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x9a => ("ushr-int", "vAA, vBB, vCC", 2, IndexType::None),
+        0x9b => ("add-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0x9c => ("sub-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0x9d => ("mul-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0x9e => ("div-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0x9f => ("rem-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa0 => ("and-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa1 => ("or-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa2 => ("xor-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa3 => ("shl-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa4 => ("shr-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa5 => ("ushr-long", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa6 => ("add-float", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa7 => ("sub-float", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa8 => ("mul-float", "vAA, vBB, vCC", 2, IndexType::None),
+        0xa9 => ("div-float", "vAA, vBB, vCC", 2, IndexType::None),
+        0xaa => ("rem-float", "vAA, vBB, vCC", 2, IndexType::None),
+        0xab => ("add-double", "vAA, vBB, vCC", 2, IndexType::None),
+        0xac => ("sub-double", "vAA, vBB, vCC", 2, IndexType::None),
+        0xad => ("mul-double", "vAA, vBB, vCC", 2, IndexType::None),
+        0xae => ("div-double", "vAA, vBB, vCC", 2, IndexType::None),
+        0xaf => ("rem-double", "vAA, vBB, vCC", 2, IndexType::None),
+        _ => ("unknown", "...", 1, IndexType::None),
+    }
+}
+
+fn get_binop_2addr(opcode: u8) -> OpcodeData {
+    match opcode {
+        0xb0 => ("add-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb1 => ("sub-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb2 => ("mul-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb3 => ("div-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb4 => ("rem-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb5 => ("and-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb6 => ("or-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb7 => ("xor-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb8 => ("shl-int/2addr", "vA, vB", 1, IndexType::None),
+        0xb9 => ("shr-int/2addr", "vA, vB", 1, IndexType::None),
+        0xba => ("ushr-int/2addr", "vA, vB", 1, IndexType::None),
+        0xbb => ("add-long/2addr", "vA, vB", 1, IndexType::None),
+        0xbc => ("sub-long/2addr", "vA, vB", 1, IndexType::None),
+        0xbd => ("mul-long/2addr", "vA, vB", 1, IndexType::None),
+        0xbe => ("div-long/2addr", "vA, vB", 1, IndexType::None),
+        0xbf => ("rem-long/2addr", "vA, vB", 1, IndexType::None),
+        0xc0 => ("and-long/2addr", "vA, vB", 1, IndexType::None),
+        0xc1 => ("or-long/2addr", "vA, vB", 1, IndexType::None),
+        0xc2 => ("xor-long/2addr", "vA, vB", 1, IndexType::None),
+        0xc3 => ("shl-long/2addr", "vA, vB", 1, IndexType::None),
+        0xc4 => ("shr-long/2addr", "vA, vB", 1, IndexType::None),
+        0xc5 => ("ushr-long/2addr", "vA, vB", 1, IndexType::None),
+        0xc6 => ("add-float/2addr", "vA, vB", 1, IndexType::None),
+        0xc7 => ("sub-float/2addr", "vA, vB", 1, IndexType::None),
+        0xc8 => ("mul-float/2addr", "vA, vB", 1, IndexType::None),
+        0xc9 => ("div-float/2addr", "vA, vB", 1, IndexType::None),
+        0xca => ("rem-float/2addr", "vA, vB", 1, IndexType::None),
+        0xcb => ("add-double/2addr", "vA, vB", 1, IndexType::None),
+        0xcc => ("sub-double/2addr", "vA, vB", 1, IndexType::None),
+        0xcd => ("mul-double/2addr", "vA, vB", 1, IndexType::None),
+        0xce => ("div-double/2addr", "vA, vB", 1, IndexType::None),
+        0xcf => ("rem-double/2addr", "vA, vB", 1, IndexType::None),
+        _ => ("unknown", "...", 1, IndexType::None),
+    }
+}
+
+fn get_binop_lit(opcode: u8) -> OpcodeData {
+    match opcode {
+        0xd0 => ("add-int/lit16", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd1 => ("rsub-int", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd2 => ("mul-int/lit16", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd3 => ("div-int/lit16", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd4 => ("rem-int/lit16", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd5 => ("and-int/lit16", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd6 => ("or-int/lit16", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd7 => ("xor-int/lit16", "vA, vB, #+CCCC", 2, IndexType::None),
+        0xd8 => ("add-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xd9 => ("rsub-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xda => ("mul-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xdb => ("div-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xdc => ("rem-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xdd => ("and-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xde => ("or-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xdf => ("xor-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xe0 => ("shl-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xe1 => ("shr-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        0xe2 => ("ushr-int/lit8", "vAA, vBB, #+CC", 2, IndexType::None),
+        _ => ("unknown", "...", 1, IndexType::None),
+    }
+}

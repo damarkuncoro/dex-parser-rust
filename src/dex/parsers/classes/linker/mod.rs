@@ -5,7 +5,8 @@ use crate::dex::error::DexError;
 use rayon::prelude::*;
 
 use crate::dex::core::utils::byte_tracker::ByteTracker;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
+use parking_lot::Mutex;
 
 pub mod field_linker;
 pub mod method_linker;
@@ -24,7 +25,7 @@ pub fn parse_linked<'a, R: DexResolver<'a> + Sync + Send>(
     tracker: Arc<Mutex<ByteTracker>>,
 ) -> Result<Vec<Class<'a>>, DexError> {
     raw_classes.par_iter().map(|raw| {
-        let mut class = crate::dex::linker::DexLinker::link_class(raw, strings, types);
+        let mut class = crate::dex::core::linker::DexLinker::link_class(raw, strings, types);
         let class_name = class.name.clone();
         let tracker = tracker.clone();
 

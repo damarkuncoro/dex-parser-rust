@@ -2,7 +2,8 @@ use crate::dex::error::DexError;
 use crate::dex::readers::leb128;
 use crate::dex::core::utils::byte_tracker::ByteTracker;
 use scroll::{Endian, Pread};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
+use parking_lot::Mutex;
 
 /// A stateful reader for binary DEX data.
 pub struct DexReader<'a> {
@@ -30,9 +31,7 @@ impl<'a> DexReader<'a> {
 
     fn mark_usage(&self, len: usize) {
         if let Some(t) = &self.tracker {
-            if let Ok(mut tracker) = t.lock() {
-                tracker.mark(self.pos, len);
-            }
+            t.lock().mark(self.pos, len);
         }
     }
 

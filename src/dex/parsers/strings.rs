@@ -17,17 +17,14 @@ impl StringSection {
     /// No UTF-8 validation or String allocation happens here.
     pub fn resolve_strings<'a>(reader: &mut DexReader<'a>, offsets: &[u32]) -> Result<Vec<&'a [u8]>, DexError> {
         let mut strings = Vec::with_capacity(offsets.len());
+        let buffer = reader.buffer();
         for &off in offsets {
             reader.seek(off as usize)?;
             let _utf16_len = reader.read_uleb128()?;
 
             let start = reader.position();
-            let mut end = start;
-            let buffer = reader.buffer();
-            while end < buffer.len() && buffer[end] != 0 {
-                end += 1;
-            }
-            let len = end - start;
+            let len = memchr::memchr(0, &buffer[start..]).ok_or(DexError::UnexpectedEOF)?;
+
             // Read the bytes including null terminator to mark them as used
             let bytes = reader.read_bytes(len + 1)?;
             strings.push(&bytes[..len]);

@@ -3,6 +3,12 @@ use crate::dex::core::models::raw::{RawFieldId, RawProtoId, RawClassDef, RawMeth
 use crate::dex::core::utils::access_flags::translate_access_flags;
 use crate::dex::core::utils::mutf8::Mutf8Display;
 
+use crate::dex::readers::DexReader;
+use crate::dex::error::DexError;
+use std::sync::{Arc};
+use parking_lot::Mutex;
+use crate::dex::core::utils::byte_tracker::ByteTracker;
+
 pub struct DexLinker;
 
 impl DexLinker {
@@ -21,18 +27,42 @@ impl DexLinker {
         }).collect()
     }
 
-    pub fn link_protos<'a>(raw_protos: &[RawProtoId], strings: &[&'a [u8]], types: &[&'a [u8]]) -> Vec<Proto<'a>> {
-        raw_protos.iter().map(|raw| {
+    pub fn link_protos<'a>(
+        buffer: &'a [u8],
+        raw_protos: &[RawProtoId],
+        strings: &[&'a [u8]],
+        types: &[&'a [u8]],
+        endian: scroll::Endian,
+        tracker: Arc<Mutex<ByteTracker>>,
+    ) -> Result<Vec<Proto<'a>>, DexError> {
+        let mut protos = Vec::with_capacity(raw_protos.len());
+
+        for raw in raw_protos {
             let shorty_bytes = strings.get(raw.shorty_idx as usize).copied().unwrap_or(b"<invalid>");
             let return_bytes = types.get(raw.return_type_idx as usize).copied().unwrap_or(b"<invalid>");
 
-            Proto {
+            let mut parameters = Vec::new();
+            if raw.parameters_off != 0 {
+                let mut reader = DexReader::new(buffer, endian).with_tracker(tracker.clone());
+                reader.seek(raw.parameters_off as usize)?;
+                let size = reader.read_u32()?;
+                for _ in 0..size {
+                    let type_idx = reader.read_u16()?;
+                    if let Some(t) = types.get(type_idx as usize) {
+                        parameters.push(format!("{}", Mutf8Display(t)));
+                    }
+                }
+            }
+
+            protos.push(Proto {
                 shorty: format!("{}", Mutf8Display(shorty_bytes)),
                 return_type: format!("{}", Mutf8Display(return_bytes)),
-                parameters: Vec::new(),
+                parameters,
                 _marker: std::marker::PhantomData,
-            }
-        }).collect()
+            });
+        }
+
+        Ok(protos)
     }
 
     pub fn link_methods(raw_methods: &[RawMethodId], strings: &[&[u8]], types: &[&[u8]], protos: &[Proto]) -> Vec<String> {

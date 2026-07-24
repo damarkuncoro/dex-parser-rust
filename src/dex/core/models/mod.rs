@@ -9,6 +9,8 @@ pub mod encoded_value;
 pub mod annotation;
 pub mod map_list;
 pub mod apk;
+pub mod analysis;
+pub mod wasm;
 
 pub use header::{RawHeader, ModernHeaderExt};
 pub use class::{Class, Code, Instruction, EncodedField, CatchHandler, TryHandler, DebugInfo, DebugEntry};
@@ -19,6 +21,7 @@ pub use encoded_value::{EncodedValue, EncodedAnnotation, AnnotationElement};
 pub use annotation::{AnnotationsDirectory, AnnotationItem, FieldAnnotation, MethodAnnotation, ParameterAnnotation};
 pub use map_list::{MapList, MapItem};
 pub use apk::Apk;
+pub use analysis::AnalysisReport;
 
 use crate::dex::parsers::traits::{StringResolver, TypeResolver, MethodResolver, FieldResolver, DexResolver};
 use serde::{Serialize};
@@ -32,6 +35,7 @@ pub struct Dex<'a> {
     pub method_handles: Vec<raw::RawMethodHandleItem>,
     pub call_sites: Vec<raw::RawCallSiteIdItem>,
     pub byte_gaps: Vec<(usize, usize)>,
+    pub analysis: AnalysisReport,
 }
 
 #[derive(Serialize, Clone)]

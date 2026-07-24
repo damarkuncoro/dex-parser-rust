@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 use crate::dex::parsers::DexParser;
-use crate::dex::core::models::{Dex, Apk};
-use std::sync::Mutex;
+use crate::dex::core::models::{Dex, Apk, wasm::{DexSummary, WasmLoadResult}};
+use parking_lot::Mutex;
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::io::{Read, Cursor};
@@ -12,21 +12,6 @@ use zip::ZipArchive;
 pub struct WasmApkResult<'a> {
     pub dex_files: Vec<Dex<'a>>,
     pub class_lookup: std::collections::HashMap<String, usize>,
-}
-
-#[derive(Serialize)]
-pub struct DexSummary {
-    pub name: String,
-    pub magic: String,
-    pub class_count: usize,
-    pub gap_count: usize,
-    pub total_gap_size: usize,
-}
-
-#[derive(Serialize)]
-pub struct WasmLoadResult {
-    pub summaries: Vec<DexSummary>,
-    pub class_names: Vec<Vec<String>>,
 }
 
 // Global state to hold parsed DEX files in WASM memory
@@ -51,7 +36,7 @@ fn send_status(_msg: &str) {
 #[wasm_bindgen]
 pub fn load_apk_wasm(buffer: &[u8]) -> Result<JsValue, JsValue> {
     send_status("Engine: Locking storage...");
-    let mut storage = PARSED_APK.lock().map_err(|_| JsValue::from_str("Lock failed"))?;
+    let mut storage = PARSED_APK.lock();
     *storage = None;
 
     send_status("Engine: Preparing buffer...");
@@ -97,12 +82,19 @@ pub fn load_apk_wasm(buffer: &[u8]) -> Result<JsValue, JsValue> {
             magic: String::from_utf8_lossy(&dex.header.magic).to_string(),
             class_count: dex.class_defs.len(),
             gap_count: dex.byte_gaps.len(),
-            total_gap_size: dex.byte_gaps.iter().map(|g| g.1).sum(),
+            total_gap_size: dex.analysis.stats.total_gap_size,
+            suspicious_gap_count: dex.analysis.stats.suspicious_gap_count,
+            max_entropy: dex.analysis.stats.max_entropy,
+            sensitive_string_count: dex.analysis.stats.sensitive_count,
         });
     }
 
     let class_names: Vec<Vec<String>> = dex_files.iter()
         .map(|dex| dex.class_defs.iter().map(|c| c.name.to_string()).collect())
+        .collect();
+
+    let scan_results: Vec<Vec<crate::dex::analysis::scanner::ScanResult>> = dex_files.iter()
+        .map(|dex| dex.analysis.sensitive_indicators.clone())
         .collect();
 
     let apk = Apk::new(dex_files);
@@ -114,12 +106,12 @@ pub fn load_apk_wasm(buffer: &[u8]) -> Result<JsValue, JsValue> {
     *storage = Some(result);
     send_status("Engine: Analysis complete.");
 
-    Ok(serde_wasm_bindgen::to_value(&WasmLoadResult { summaries, class_names }).unwrap())
+    Ok(serde_wasm_bindgen::to_value(&WasmLoadResult { summaries, class_names, scan_results }).unwrap())
 }
 
 #[wasm_bindgen]
 pub fn get_class_details_wasm(dex_idx: usize, class_idx: usize) -> Result<JsValue, JsValue> {
-    let storage = PARSED_APK.lock().map_err(|_| JsValue::from_str("Lock failed"))?;
+    let storage = PARSED_APK.lock();
     let apk = storage.as_ref().ok_or_else(|| JsValue::from_str("No APK loaded"))?;
 
     let dex = apk.dex_files.get(dex_idx).ok_or_else(|| JsValue::from_str("Invalid DEX index"))?;

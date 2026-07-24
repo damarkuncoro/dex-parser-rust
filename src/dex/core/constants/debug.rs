@@ -1,0 +1,13 @@
+pub const END_SEQUENCE: u8 = 0x00;
+pub const ADVANCE_PC: u8 = 0x01;
+pub const ADVANCE_LINE: u8 = 0x02;
+pub const START_LOCAL: u8 = 0x03;
+pub const START_LOCAL_EXTENDED: u8 = 0x04;
+pub const END_LOCAL: u8 = 0x05;
+pub const RESTART_LOCAL: u8 = 0x06;
+pub const SET_PROLOGUE_END: u8 = 0x07;
+pub const SET_EPILOGUE_BEGIN: u8 = 0x08;
+pub const SET_FILE: u8 = 0x09;
+pub const FIRST_SPECIAL: u8 = 0x0a;
+pub const LINE_BASE: i32 = -4;
+pub const LINE_RANGE: u8 = 15;
