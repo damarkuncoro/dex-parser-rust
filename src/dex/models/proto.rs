@@ -1,6 +1,6 @@
-use serde::Serialize;
+use serde::{Serialize};
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize,  Clone)]
 pub struct Proto<'a> {
     pub shorty: &'a str,
     pub return_type: &'a str,

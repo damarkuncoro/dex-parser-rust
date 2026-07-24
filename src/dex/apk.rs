@@ -2,13 +2,13 @@ use std::io::{Read, Cursor};
 use zip::ZipArchive;
 use crate::dex::error::DexError;
 use crate::dex::parsers::DexParser;
-use crate::dex::models::Dex;
+use crate::dex::models::Apk;
 
 pub struct ApkParser;
 
 impl ApkParser {
-    /// Parses all DEX files found inside an APK.
-    pub fn parse_apk(buffer: &[u8]) -> Result<Vec<Dex<'_>>, DexError> {
+    /// Parses all DEX files found inside an APK and returns a unified Apk model.
+    pub fn parse_apk(buffer: &[u8]) -> Result<Apk<'_>, DexError> {
         let reader = Cursor::new(buffer);
         let mut archive = ZipArchive::new(reader).map_err(|e| DexError::IoError(std::io::Error::new(std::io::ErrorKind::Other, e)))?;
 
@@ -35,6 +35,6 @@ impl ApkParser {
             return Err(DexError::InvalidMagic);
         }
 
-        Ok(dex_files)
+        Ok(Apk::new(dex_files))
     }
 }

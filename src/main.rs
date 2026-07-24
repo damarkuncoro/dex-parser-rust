@@ -26,8 +26,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Check if it's an APK (ZIP) or raw DEX
     if buffer.starts_with(b"PK\x03\x04") {
-        let dex_files = ApkParser::parse_apk(&buffer)?;
-        for (i, dex) in dex_files.iter().enumerate() {
+        let apk = ApkParser::parse_apk(&buffer)?;
+        for (i, dex) in apk.dex_files.iter().enumerate() {
             if args.format == OutputFormat::Text {
                 if let Err(e) = writeln!(stdout, "\n--- DEX File #{} ---", i) {
                     if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }
@@ -40,7 +40,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     } else {
-        // Use the new Public API
         let dex = DexParser::parse(&buffer)?;
         if let Err(e) = printer.print(&dex, &args.path, &mut stdout) {
             if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }

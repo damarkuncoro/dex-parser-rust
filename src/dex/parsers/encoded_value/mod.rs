@@ -28,12 +28,7 @@ pub fn parse<'a, R: DexResolver<'a>>(
             resolve_complex(value_type, val, resolver)
         }
         value_types::ARRAY => {
-            let size = reader.read_uleb128()?;
-            let mut values = Vec::with_capacity(size as usize);
-            for _ in 0..size {
-                values.push(parse(reader, resolver)?);
-            }
-            Ok(EncodedValue::Array(values))
+            Ok(EncodedValue::Array(parse_encoded_array(reader, resolver)?))
         }
         value_types::ANNOTATION => {
             Ok(EncodedValue::Annotation(parse_annotation(reader, resolver)?))
@@ -42,6 +37,18 @@ pub fn parse<'a, R: DexResolver<'a>>(
         value_types::BOOLEAN => Ok(EncodedValue::Boolean(value_arg != 0)),
         _ => Err(DexError::InvalidIndex(format!("Unknown encoded value type: 0x{:02x}", value_type))),
     }
+}
+
+pub fn parse_encoded_array<'a, R: DexResolver<'a>>(
+    reader: &mut DexReader<'a>,
+    resolver: &R,
+) -> Result<Vec<EncodedValue<'a>>, DexError> {
+    let size = reader.read_uleb128()?;
+    let mut values = Vec::with_capacity(size as usize);
+    for _ in 0..size {
+        values.push(parse(reader, resolver)?);
+    }
+    Ok(values)
 }
 
 pub fn parse_annotation<'a, R: DexResolver<'a>>(

@@ -12,10 +12,12 @@ pub mod encoded_value;
 pub mod annotations;
 pub mod debug_info;
 pub mod map_list;
+pub mod method_handles;
+pub mod call_sites;
 
 use crate::dex::constants::{offsets::ENDIAN_TAG, ENDIAN_CONSTANT};
 use crate::dex::error::DexError;
-use crate::dex::models::{Dex, DexMetadata};
+use crate::dex::models::{Dex, DexMetadata, map_list::types as map_types};
 use crate::dex::readers::DexReader;
 use crate::dex::validator::DexValidator;
 use crate::dex::linker::DexLinker;
@@ -26,6 +28,8 @@ use self::methods::MethodIdParser;
 use self::protos::ProtoIdParser;
 use self::fields::FieldIdParser;
 use self::classes::ClassDefParser;
+use self::method_handles::MethodHandleParser;
+use self::call_sites::CallSiteParser;
 use self::traits::SimpleResolver;
 use scroll::Endian;
 use std::io::Read;
@@ -48,16 +52,50 @@ impl<'a> DexParser<'a> {
         let endian = self.detect_endian()?;
         let mut reader = DexReader::new(self.buffer, endian);
 
-        // Stage 1: Atomic Extraction (Physical)
+        // Stage 0: Initial Header & MapList (The Authority)
         let header = HeaderParser::parse(&mut reader)?;
         DexValidator::new().validate(self.buffer, &header)?;
+        let map_list = map_list::parse(self.buffer, header.map_off as usize, endian)?;
 
-        let string_offsets = StringSection::parse_offsets(&mut reader, header.string_ids_size, header.string_ids_off)?;
-        let type_indices = TypeIdParser::parse(&mut reader, header.type_ids_size, header.type_ids_off)?;
-        let raw_protos = ProtoIdParser::parse(&mut reader, header.proto_ids_size, header.proto_ids_off)?;
-        let raw_fields = FieldIdParser::parse(&mut reader, header.field_ids_size, header.field_ids_off)?;
-        let raw_methods = MethodIdParser::parse(&mut reader, header.method_ids_size, header.method_ids_off)?;
-        let raw_classes = ClassDefParser::parse(&mut reader, header.class_defs_size, header.class_defs_off)?;
+        // Stage 1: Atomic Extraction
+        let mut string_offsets = Vec::new();
+        let mut type_indices = Vec::new();
+        let mut raw_protos = Vec::new();
+        let mut raw_fields = Vec::new();
+        let mut raw_methods = Vec::new();
+        let mut raw_classes = Vec::new();
+        let mut raw_method_handles = Vec::new();
+        let mut raw_call_sites = Vec::new();
+
+        for item in &map_list.items {
+            match item.item_type {
+                map_types::TYPE_STRING_ID_ITEM => {
+                    string_offsets = StringSection::parse_offsets(&mut reader, item.size, item.offset)?;
+                }
+                map_types::TYPE_TYPE_ID_ITEM => {
+                    type_indices = TypeIdParser::parse(&mut reader, item.size, item.offset)?;
+                }
+                map_types::TYPE_PROTO_ID_ITEM => {
+                    raw_protos = ProtoIdParser::parse(&mut reader, item.size, item.offset)?;
+                }
+                map_types::TYPE_FIELD_ID_ITEM => {
+                    raw_fields = FieldIdParser::parse(&mut reader, item.size, item.offset)?;
+                }
+                map_types::TYPE_METHOD_ID_ITEM => {
+                    raw_methods = MethodIdParser::parse(&mut reader, item.size, item.offset)?;
+                }
+                map_types::TYPE_CLASS_DEF_ITEM => {
+                    raw_classes = ClassDefParser::parse(&mut reader, item.size, item.offset)?;
+                }
+                map_types::TYPE_METHOD_HANDLE_ITEM => {
+                    raw_method_handles = MethodHandleParser::parse(&mut reader, item.size, item.offset)?;
+                }
+                map_types::TYPE_CALL_SITE_ID_ITEM => {
+                    raw_call_sites = CallSiteParser::parse(&mut reader, item.size, item.offset)?;
+                }
+                _ => {}
+            }
+        }
 
         // Stage 2: Value Resolution (Zero-Copy)
         let strings = StringSection::resolve_strings(self.buffer, &string_offsets)?;
@@ -106,8 +144,6 @@ impl<'a> DexParser<'a> {
             endian
         )?;
 
-        let map_list = map_list::parse(self.buffer, header.map_off as usize, endian)?;
-
         Ok(Dex {
             header,
             metadata: DexMetadata {
@@ -119,6 +155,8 @@ impl<'a> DexParser<'a> {
             },
             class_defs: classes,
             map_list,
+            method_handles: raw_method_handles,
+            call_sites: raw_call_sites,
         })
     }
 
@@ -132,7 +170,6 @@ impl<'a> DexParser<'a> {
 /// Standalone convenience functions for the Public API
 impl DexParser<'static> {
     /// Convenience: Parse DEX directly from a file path.
-    /// Note: This reads and leaks the buffer to provide a 'static lifetime.
     pub fn parse_file<P: AsRef<std::path::Path>>(path: P) -> Result<Dex<'static>, DexError> {
         let mut file = std::fs::File::open(path).map_err(DexError::IoError)?;
         let mut buffer = Vec::new();

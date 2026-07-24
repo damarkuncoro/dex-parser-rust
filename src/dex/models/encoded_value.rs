@@ -1,7 +1,6 @@
-use serde::Serialize;
+use serde::{Serialize};
 
-#[derive(Serialize, Clone, Debug)]
-#[serde(rename_all = "snake_case")]
+#[derive(Serialize,  Clone, Debug)]
 pub enum EncodedValue<'a> {
     Byte(i8),
     Short(i16),
@@ -23,13 +22,13 @@ pub enum EncodedValue<'a> {
     Boolean(bool),
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize,  Clone, Debug)]
 pub struct EncodedAnnotation<'a> {
     pub type_name: &'a str,
     pub elements: Vec<AnnotationElement<'a>>,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize,  Clone, Debug)]
 pub struct AnnotationElement<'a> {
     pub name: &'a str,
     pub value: EncodedValue<'a>,

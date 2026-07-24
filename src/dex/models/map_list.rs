@@ -1,12 +1,12 @@
-use serde::Serialize;
 use scroll::Pread;
+use serde::{Serialize};
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize,  Debug, Clone)]
 pub struct MapList {
     pub items: Vec<MapItem>,
 }
 
-#[derive(Serialize, Debug, Clone, Pread)]
+#[derive(Serialize,  Debug, Clone, Pread)]
 pub struct MapItem {
     pub item_type: u16,
     pub unused: u16,

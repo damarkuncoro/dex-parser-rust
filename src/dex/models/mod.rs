@@ -8,8 +8,9 @@ pub mod raw;
 pub mod encoded_value;
 pub mod annotation;
 pub mod map_list;
+pub mod apk;
 
-pub use header::RawHeader;
+pub use header::{RawHeader, ModernHeaderExt};
 pub use class::{Class, Code, Instruction, EncodedField, CatchHandler, TryHandler, DebugInfo, DebugEntry};
 pub use field::Field;
 pub use method::EncodedMethod;
@@ -17,17 +18,19 @@ pub use proto::Proto;
 pub use encoded_value::{EncodedValue, EncodedAnnotation, AnnotationElement};
 pub use annotation::{AnnotationsDirectory, AnnotationItem, FieldAnnotation, MethodAnnotation, ParameterAnnotation};
 pub use map_list::{MapList, MapItem};
+pub use apk::Apk;
 
 use crate::dex::parsers::traits::{StringResolver, TypeResolver, MethodResolver, FieldResolver, DexResolver};
-use serde::Serialize;
+use serde::{Serialize};
 
-/// Represents a fully parsed Android DEX file using zero-copy where possible.
 #[derive(Serialize)]
 pub struct Dex<'a> {
     pub header: RawHeader,
     pub metadata: DexMetadata<'a>,
     pub class_defs: Vec<Class<'a>>,
     pub map_list: MapList,
+    pub method_handles: Vec<raw::RawMethodHandleItem>,
+    pub call_sites: Vec<raw::RawCallSiteIdItem>,
 }
 
 #[derive(Serialize, Clone)]

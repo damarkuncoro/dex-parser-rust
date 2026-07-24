@@ -1,28 +1,28 @@
 use scroll::Pread;
-use serde::Serialize;
+use serde::{Serialize};
 
-#[derive(Debug, Pread, Serialize, Clone)]
+#[derive(Debug, Pread, Serialize,  Clone)]
 pub struct RawMethodId {
     pub class_idx: u16,
     pub proto_idx: u16,
     pub name_idx: u32,
 }
 
-#[derive(Debug, Pread, Serialize, Clone)]
+#[derive(Debug, Pread, Serialize,  Clone)]
 pub struct RawProtoId {
     pub shorty_idx: u32,
     pub return_type_idx: u32,
     pub parameters_off: u32,
 }
 
-#[derive(Debug, Pread, Serialize, Clone)]
+#[derive(Debug, Pread, Serialize,  Clone)]
 pub struct RawFieldId {
     pub class_idx: u16,
     pub type_idx: u16,
     pub name_idx: u32,
 }
 
-#[derive(Debug, Pread, Serialize, Clone)]
+#[derive(Debug, Pread, Serialize,  Clone)]
 pub struct RawClassDef {
     pub class_idx: u32,
     pub access_flags: u32,
@@ -34,7 +34,7 @@ pub struct RawClassDef {
     pub static_values_off: u32,
 }
 
-#[derive(Debug, Pread, Serialize, Clone)]
+#[derive(Debug, Pread, Serialize,  Clone)]
 pub struct RawCodeItem {
     pub registers_size: u16,
     pub ins_size: u16,
@@ -42,4 +42,17 @@ pub struct RawCodeItem {
     pub tries_size: u16,
     pub debug_info_off: u32,
     pub insns_size: u32,
+}
+
+#[derive(Debug, Pread, Serialize,  Clone)]
+pub struct RawMethodHandleItem {
+    pub method_handle_type: u16,
+    pub unused1: u16,
+    pub field_or_method_id: u16,
+    pub unused2: u16,
+}
+
+#[derive(Debug, Pread, Serialize,  Clone)]
+pub struct RawCallSiteIdItem {
+    pub call_site_off: u32,
 }

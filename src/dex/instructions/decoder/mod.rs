@@ -36,11 +36,13 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
         }
 
         let current_instr_byte_addr = pc - curr;
+        let mut struct_index = None;
+        let mut struct_resolved = None;
 
         if !units.is_empty() {
             let op_unit = units[0];
 
-            // 1. Substitute Special Ranges & Multi-Register Formats (Order: Longest first)
+            // 1. Substitute Special Ranges & Multi-Register Formats
             if description.contains("{vC..vG}") {
                 let count = (op_unit >> 12) & 0xf;
                 let g = (op_unit >> 8) & 0xf;
@@ -63,7 +65,7 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
                 description = description.replace("{vCCCC..vNNNN}", &format!("{{v{} .. v{}}}", start, start + count as u16 - 1));
             }
 
-            // 2. Substitute Immediates & Constants (Longest patterns first)
+            // 2. Substitute Immediates & Constants
             if description.contains("#+BBBBBBBB") {
                 let b: u32 = buffer.pread_with(pc + 2, endian).unwrap_or(0);
                 description = description.replace("#+BBBBBBBB", &format!("#0x{:08x}", b));
@@ -84,7 +86,7 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
                 description = description.replace("#+B", &format!("#{:+} (0x{:x})", b, b as u8 & 0xf));
             }
 
-            // 3. Substitute Branch Offsets (Absolute labels)
+            // 3. Substitute Branch Offsets
             if description.contains("+CCCC") {
                 let off = units.get(1).cloned().unwrap_or(0) as i16;
                 description = description.replace("+CCCC", &format!(":label_{:04x}", (current_instr_byte_addr as i32 + (off as i32 * 2)) as u32));
@@ -96,33 +98,29 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
                 description = description.replace("+AA", &format!(":label_{:04x}", (current_instr_byte_addr as i32 + (off as i32 * 2)) as u32));
             }
 
-            // 4. Substitute Registers (Order: Longest first)
+            // 4. Substitute Registers
             description = description.replace("vAAAA", &format!("v{}", units.get(1).cloned().unwrap_or(0)));
-
-            // Format 23x (vAA, vBB, vCC)
             if description.contains("vBB") && description.contains("vCC") {
                 let v_unit = units.get(1).cloned().unwrap_or(0);
                 description = description.replace("vBB", &format!("v{}", v_unit & 0xff));
                 description = description.replace("vCC", &format!("v{}", (v_unit >> 8) & 0xff));
             }
-
-            // Format 22b (vAA, vBB, #+CC)
             if description.contains("vAA") && description.contains("vBB") {
                  description = description.replace("vAA", &format!("v{}", (op_unit >> 8) & 0xff));
                  description = description.replace("vBB", &format!("v{}", units.get(1).cloned().unwrap_or(0) & 0xff));
             }
-
             description = description.replace("vAA", &format!("v{}", (op_unit >> 8) & 0xff));
             description = description.replace("vA", &format!("v{}", (op_unit >> 8) & 0xf));
             description = description.replace("vB", &format!("v{}", (op_unit >> 12) & 0xf));
 
-            // 5. Substitute Cross-References
+            // 5. Substitute Cross-References (Fill Structured Data)
             if info.index_type != IndexType::None {
                 let index: u32 = if opcode_byte == 0x1b { // const-string/jumbo
                     buffer.pread_with(pc + 2, endian).unwrap_or(0)
                 } else {
                     units.get(1).cloned().unwrap_or(0) as u32
                 };
+                struct_index = Some(index);
 
                 let resolved = match info.index_type {
                     IndexType::String => self.resolver.resolve_string(index)
@@ -138,6 +136,7 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
                         .unwrap_or_else(|| format!("field@{:04x}", index)),
                     IndexType::None => String::new(),
                 };
+                struct_resolved = Some(resolved.clone());
 
                 if description.contains("string@") { description = description.replace("string@", &format!("{}", resolved)); }
                 else if description.contains("type@") { description = description.replace("type@", &format!("{}", resolved)); }
@@ -152,6 +151,8 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
             opcode: opcode_byte,
             name: info.name,
             description,
+            index: struct_index,
+            resolved_value: struct_resolved,
         };
 
         (instruction, info.length * 2)

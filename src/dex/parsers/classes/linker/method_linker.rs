@@ -37,7 +37,7 @@ pub fn link_methods<'a, R: DexResolver<'a>>(
             signature,
             access_flags: raw.access_flags as u32,
             access_flags_text: translate_access_flags(raw.access_flags as u32, true),
-            code_off: raw.code_off,
+            code_off: raw.code_off as u32,
             code,
         });
     }

@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Serialize};
 use super::method::EncodedMethod;
 use super::annotation::AnnotationsDirectory;
 use super::encoded_value::EncodedValue;
@@ -59,16 +59,19 @@ pub struct Instruction {
     pub opcode: u8,
     pub name: String,
     pub description: String,
+    // Structured reference data
+    pub index: Option<u32>,
+    pub resolved_value: Option<String>,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize,  Clone, Debug)]
 pub struct DebugInfo<'a> {
     pub line_start: u32,
     pub parameters: Vec<Option<&'a str>>,
     pub entries: Vec<DebugEntry<'a>>,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize,  Clone, Debug)]
 pub enum DebugEntry<'a> {
     LineNumber { address_diff: u32, line_diff: i32 },
     StartLocal { address_diff: u32, name: &'a str, type_name: &'a str },

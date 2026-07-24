@@ -11,6 +11,7 @@ pub mod utils;
 pub mod validator;
 pub mod linker;
 pub mod apk;
+pub mod analysis; // The Analyst Specialty
 
 pub use error::DexError;
 pub use models::Dex;

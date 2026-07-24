@@ -5,6 +5,7 @@
 
 pub mod dex;
 pub mod ffi;
+pub mod wasm;
 
 // Public API Re-exports
 pub use crate::dex::parsers::DexParser;
