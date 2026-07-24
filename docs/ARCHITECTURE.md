@@ -8,27 +8,27 @@ This document provides a formal architecture description for `dex-parser-rust`, 
 ## 2. The Three Pillars of dex-parser-rust
 The entire design of the system is built upon three foundational pillars:
 
-### I. High Performance (Parallelism)
-Leveraging modern multi-core hardware via **Rayon**. Unlike traditional single-threaded parsers, this engine parallelizes class processing, high-level linking, and bytecode disassembly, providing near-linear performance scaling with CPU core count.
+### I. High Performance (Parallelism & WASM)
+Leveraging modern multi-core hardware via **Rayon** for desktop and high-speed **WebAssembly** for browser environments. The engine parallelizes class processing, high-level linking, and bytecode disassembly.
 
-### II. Safety & Efficiency (Zero-Copy)
-Utilizing Rust's ownership model to implement **Zero-Copy parsing**. Data (Strings, Types, Signatures) is referenced directly from the original buffer, minimizing heap allocations and eliminating memory vulnerabilities.
+### II. Safety & Efficiency (Zero-Copy & Resiliency)
+Utilizing Rust's ownership model to implement **Zero-Copy parsing**. Data is referenced directly from the original buffer. The system includes a **Resilient String Resolver** to handle Android's *Modified UTF-8* (MUTF-8) without crashing.
 
-### III. Radical Modularity (Atomic Parsing & Linking)
-Strict separation between **Physical Binary Extraction** (Atomic Parsers) and **Logical Symbol Resolution** (Linker Engine). This "Shared-Nothing" architecture ensures that components are highly independent and testable.
+### III. Radical Modularity (Atomic Parsing & Analysis Layer)
+Strict separation between **Physical Binary Extraction** (Atomic Parsers), **Logical Symbol Resolution** (Linker Engine), and **Intelligence Layer** (Analysis Engine).
 
 ---
 
 ## 3. Architecture Viewpoints
 
 ### 3.1 Logical Viewpoint
-Focuses on the functional decomposition. The system is designed using the **Linker Pattern** and **Registry-based Opcodes**.
+Focuses on the functional decomposition. Designed using the **Linker Pattern** and **Registry-based Opcodes** to isolate physical data from logical application symbols.
 
 ### 3.2 Process Viewpoint
-Describes runtime behavior, specifically the multi-stage pipeline: **Extraction -> Validation -> Resolution -> Linking**.
+Describes runtime behavior, specifically the multi-stage pipeline: **Extraction -> Validation -> Resolution -> Linking -> Analysis**. It supports **Asynchronous execution** via Web Workers in the browser.
 
 ### 3.3 Implementation Viewpoint
-Focuses on the organization of software modules. Includes **Auto-Versioning** via build scripts and **Cross-Language Interoperability** via FFI.
+Focuses on the organization of software modules. Includes **Hybrid Compilation** (Native/WASM), **Auto-Versioning** via build scripts, and **Stateful Session Management** in Rust memory.
 
 ---
 
@@ -37,37 +37,40 @@ Focuses on the organization of software modules. Includes **Auto-Versioning** vi
 ### 4.1 Logical View
 - **`ValidationRule` Trait**: A rule-based engine for pluggable file integrity checks.
 - **`DexResolver` Trait**: Dependency Injection interface for zero-copy symbol resolution.
-- **`OpcodeTable`**: A modular reference for 100% of Dalvik opcodes.
-- **Public API**: Ergonomic entry points like `DexParser::parse(buffer)` and `DexParser::parse_file(path)`.
-- **C-ABI Export**: Stable FFI layer for integration with other languages.
+- **`OpcodeTable`**: A modular reference for 100% of Dalvik opcodes (0x00 - 0xFF).
+- **`ApkContext`**: A global authority for Cross-DEX linking in Multidex environments.
+- **`AnalysisEngine`**: Modular units for XREF (Cross-Reference) and CFG (Control Flow Graph).
 
 ### 4.2 Process View (Data Pipeline)
 1. **Stage 1: Atomic Extraction**: Raw binary data is extracted into `RawModels`.
 2. **Stage 2: Rule-Based Validation**: Sequential execution of integrity rules.
-3. **Stage 3: Value Resolution**: Zero-copy resolution of descriptors.
-4. **Stage 4: Parallel Linking & Assembly**: Orchestrating the `DexLinker` cross-threads.
+3. **Stage 3: Value Resolution**: Zero-copy resolution with MUTF-8 resiliency.
+4. **Stage 4: Parallel Linking & Assembly**: Orchestrating the `DexLinker` to build a unified `Apk` model.
+5. **Stage 5: Intelligence Analysis**: Generating XREFs and Basic Blocks for the CFG.
 
 ### 4.3 Implementation View (Module Structure)
-- **`readers/`**: Low-level binary stream management.
-- **`parsers/`**: Atomic units with internal sub-modules.
-- **`linker/`**: The central hub for connecting raw indices into logical relations.
-- **`ffi.rs`**: The C-compatible bridge for external language support.
-- **`build.rs`**: Automatic versioning script for injecting Git metadata.
+- **`readers/`**: Low-level binary stream management (LEB128, Endianness).
+- **`parsers/`**: Atomic units with internal sub-modules (including modern 038+ tables).
+- **`analysis/`**: Intelligence layer for semantic conclusions (XREF, CFG).
+- **`wasm.rs`**: Stateful bridge between Rust memory and JavaScript.
+- **`ffi.rs`**: C-compatible bridge for external language support (Python, C++).
 
 ### 4.4 Deployment View
-- **APK/Multidex Support**: Integrated `ApkParser` for automatic ZIP extraction.
-- **Polyglot Deployment**: Available as a standalone CLI, a Rust library (Crates.io), or a Shared Object library (`cdylib`) for Python/C++/Java.
-- **CI/CD Pipeline**: Automated testing and cross-platform releases via GitHub Actions.
+- **Polyglot & Multi-Platform**: Available as a standalone CLI, Rust library, Shared Object library (`cdylib`), and WebAssembly module.
+- **Web Sandbox**: A zero-install browser environment using Web Workers for non-blocking analysis of large APKs.
+- **CI/CD Pipeline**: Automated multi-platform releases via GitHub Actions.
 
 ---
 
 ## 5. Architecture Rationale
 - **Rust Language**: Chosen for memory safety and zero-cost abstractions.
-- **Rayon**: Selected for high-level data parallelism.
-- **C-ABI (FFI)**: Implemented to make the high-performance engine accessible to the wider developer ecosystem beyond Rust.
-- **Git-linked Versioning**: Ensured for binary traceability.
+- **Stateful WASM**: Implemented to avoid the massive overhead of serializing large APK data into JavaScript objects.
+- **Hybrid Concurrent Model**: Uses Rayon for CPU-bound tasks on Desktop and Web Workers for thread-isolation in Browsers.
+- **Separation of Concerns**: Parser focuses on data fidelity; Analysis Engine focuses on semantic intelligence.
 
 ---
 
 ## 6. Consistency and Completeness
-- Compliant with ISO 42010 by addressing stakeholders through documented viewpoints.
+- All logical traits are mapped to granular implementation files.
+- The architecture ensures 100% opcode coverage and strict error handling via `Result<T, DexError>`.
+- Compliant with ISO 42010.
