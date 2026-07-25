@@ -18,4 +18,5 @@ pub struct WasmLoadResult {
     pub summaries: Vec<DexSummary>,
     pub class_names: Vec<Vec<String>>,
     pub scan_results: Vec<Vec<ScanResult>>,
+    pub global_intelligence: crate::dex::analysis::GlobalIntelligence,
 }

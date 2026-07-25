@@ -23,7 +23,8 @@ pub fn substitute_special(description: &mut String, op_unit: u16, units: &[u16])
     } else if description.contains("{vCCCC..vNNNN}") {
         let count = (op_unit >> 8) & 0xff;
         let start = units.get(2).cloned().unwrap_or(0);
-        *description = description.replace("{vCCCC..vNNNN}", &format!("{{v{} .. v{}}}", start, start + count as u16 - 1));
+        let end = if count > 0 { (start as u32 + count as u32 - 1) as u16 } else { start };
+        *description = description.replace("{vCCCC..vNNNN}", &format!("{{v{} .. v{}}}", start, end));
     }
 }
 

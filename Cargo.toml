@@ -40,5 +40,5 @@ parking_lot = "0.12"
 criterion = "0.5"
 
 [[bench]]
-name = "parser_bench"
+name = "bench_main"
 harness = false

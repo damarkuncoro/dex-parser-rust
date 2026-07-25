@@ -97,16 +97,22 @@ pub fn load_apk_wasm(buffer: &[u8]) -> Result<JsValue, JsValue> {
         .map(|dex| dex.analysis.sensitive_indicators.clone())
         .collect();
 
-    let apk = Apk::new(dex_files);
+    let apk = Apk::new(dex_files, &names);
     let result = WasmApkResult {
         dex_files: unsafe { std::mem::transmute::<Vec<Dex<'_>>, Vec<Dex<'static>>>(apk.dex_files) },
         class_lookup: apk.class_lookup,
     };
 
     *storage = Some(result);
+    let intel = apk.intelligence;
     send_status("Engine: Analysis complete.");
 
-    Ok(serde_wasm_bindgen::to_value(&WasmLoadResult { summaries, class_names, scan_results }).unwrap())
+    Ok(serde_wasm_bindgen::to_value(&WasmLoadResult {
+        summaries,
+        class_names,
+        scan_results,
+        global_intelligence: intel,
+    }).unwrap())
 }
 
 #[wasm_bindgen]

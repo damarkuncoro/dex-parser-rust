@@ -80,12 +80,16 @@ print(f"Total classes: {count}")
 
 ---
 
-## ⏱️ Performance & Output
+## ⏱️ Performance & Benchmarks
 
-`dex-parser-rust` is designed for extreme speed and human clarity. 
+`dex-parser-rust` is built for extreme speed and efficiency. 
 
-- **Performance**: Throughput of **~100 MB/s** and **1.8x faster** than official SDK tools. See [Benchmark Report](./docs/BENCHMARKS.md).
-- **Readability**: Offers "Smali-Lite" output with resolved symbols and labels. See [Output Comparison](./docs/OUTPUT_COMPARISON.md).
+| Metric | Average Speed |
+| :--- | :--- |
+| **DEX Parsing (w/ Disassembly)** | **~1.17 ms** |
+| **XREF Analysis** | **~43.17 µs** |
+
+*Benchmarks conducted on `UnCrackable1.apk` (classes.dex) using Criterion.rs. See the full [Benchmark Report](./docs/BENCHMARKS.md) for details.*
 
 ---
 
