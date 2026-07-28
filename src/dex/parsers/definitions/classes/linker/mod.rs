@@ -1,6 +1,7 @@
 use crate::dex::core::models::{Class, header::RawHeader, raw::RawClassDef, Field};
 use crate::dex::core::models::raw::RawMethodId;
-use crate::dex::parsers::{class_data, traits::DexResolver, annotations};
+use crate::dex::parsers::definitions::{class_data, annotations, encoded_value};
+use crate::dex::parsers::core::traits::DexResolver;
 use crate::dex::error::DexError;
 use rayon::prelude::*;
 
@@ -56,7 +57,7 @@ pub fn parse_linked<'a, R: DexResolver<'a> + Sync + Send>(
 
             if raw.static_values_off != 0 {
                 reader.seek(raw.static_values_off as usize)?;
-                class.static_values = crate::dex::parsers::encoded_value::parse_encoded_array(&mut reader, resolver)?;
+                class.static_values = encoded_value::parse_encoded_array(&mut reader, resolver)?;
             }
             Ok(())
         })();

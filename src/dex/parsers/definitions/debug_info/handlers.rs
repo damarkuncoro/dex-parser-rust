@@ -1,5 +1,5 @@
 use crate::dex::core::models::{DebugEntry};
-use crate::dex::parsers::traits::DexResolver;
+use crate::dex::parsers::core::traits::DexResolver;
 use crate::dex::readers::DexReader;
 use crate::dex::core::constants::debug;
 

@@ -3,6 +3,7 @@ use crate::analysis::core::traits::ApkAnalyzer;
 use crate::analysis::core::utils::{Reference, ReferenceExtractor};
 use crate::analysis::core::models::{GlobalIntelligence, CallSite};
 use crate::analysis::forensics::rules::BehaviorScanner;
+use crate::analysis::forensics::engine::ManifestAnalyzer;
 use rayon::prelude::*;
 
 pub struct GlobalAnalyzer;
@@ -10,7 +11,26 @@ pub struct GlobalAnalyzer;
 impl ApkAnalyzer for GlobalAnalyzer {
     type Output = GlobalIntelligence;
     fn analyze(&self, apk: &Apk, dex_names: &[String]) -> Self::Output {
-        GlobalIntelligence::build(apk, dex_names)
+        let mut intel = GlobalIntelligence::build(apk, dex_names);
+
+        // 1. Resolve Resource IDs from code
+        if let Some(res_table) = &apk.resources {
+            for dex in &apk.dex_files {
+                for &id in &dex.analysis.potential_resource_ids {
+                    if let Some(name) = res_table.id_map.get(&id) {
+                        intel.resolved_resources.insert(id, name.clone());
+                    }
+                }
+            }
+        }
+
+        // Add Manifest Analysis to global indicators
+        if let Some(manifest) = &apk.manifest {
+            let manifest_results = ManifestAnalyzer::analyze(manifest);
+            intel.behavioral_indicators.extend(manifest_results);
+        }
+
+        intel
     }
 }
 

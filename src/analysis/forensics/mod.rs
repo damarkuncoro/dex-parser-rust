@@ -1,15 +1,14 @@
+pub mod analyzer;
+pub mod engine;
+pub mod rules;
+pub mod behavior_visitor;
 pub mod entropy;
 pub mod scanner;
-pub mod analyzer;
-pub mod rules;
-pub mod behavior;
-pub mod behavior_visitor;
-pub mod obfuscation;
+pub mod resource_visitor;
 
+pub use analyzer::ForensicAnalyzer;
+pub use engine::{ManifestAnalyzer, ObfuscationVisitor, BehaviorAnalyzer};
+pub use behavior_visitor::BehaviorVisitor;
 pub use entropy::EntropyAnalyzer;
 pub use scanner::StringScanner;
-pub use analyzer::ForensicAnalyzer;
-pub use rules::BehaviorScanner;
-pub use behavior::BehaviorAnalyzer;
-pub use behavior_visitor::BehaviorVisitor;
-pub use obfuscation::ObfuscationVisitor;
+pub use resource_visitor::ResourceVisitor;

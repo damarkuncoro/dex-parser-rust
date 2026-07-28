@@ -28,6 +28,10 @@ pub struct Cli {
     #[arg(short, long)]
     pub config: Option<String>,
 
+    /// Generate a Graphviz DOT file for the call graph
+    #[arg(long)]
+    pub call_graph: Option<String>,
+
     /// Enable verbose logging
     #[arg(short, long)]
     pub verbose: bool,

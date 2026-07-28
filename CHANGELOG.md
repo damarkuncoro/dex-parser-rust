@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2024-06-16
+
+### Added
+- **Deep Modular Parser Architecture**: Categorized DEX parsers into `core`, `identifiers`, and `definitions` for better maintainability and encapsulation.
+- **Resource ID Resolution**: Implemented `ArscParser` and `ResourceVisitor` to map binary Resource IDs (0x7f...) to human-readable names from `resources.arsc`.
+- **Call Graph Visualization**: Added `--call-graph` CLI option to export global method-to-method relationships in Graphviz DOT format.
+- **Manifest Forensic Analysis**: New `ManifestAnalyzer` to detect dangerous permission combinations, persistence via boot-completed receivers, and stealth components.
+- **Parallel Visitor Pipeline**: All analysis passes (Stats, XREF, Behavior, Obfuscation, Resources) now run in a single optimized parallel walk.
+
+### Fixed
+- **AXML Decoding Robustness**: Enhanced handling of UTF-8 and UTF-16 string pools in Android Binary XML, supporting complex length encodings.
+- **Namespace Resolution**: Consistent use of `Arc<AnalysisConfig>` across parallel visitors to ensure thread-safety and eliminate lifetime issues.
+
+### Changed
+- **CLI Enhancements**: Added real-time progress feedback on `stderr` and support for full APK intelligence summaries.
+- **Unified Global Intelligence**: Consolidated cross-DEX findings and resolved resources into a single APK-level report.
+
 ## [1.4.0] - 2024-06-15
 
 ### Added

@@ -65,6 +65,7 @@ pub struct Instruction {
     pub resolved_value: Option<String>,
     pub registers: Vec<u16>,
     pub target_offset: Option<u32>,
+    pub immediates: Vec<u64>,
 }
 
 #[derive(Serialize, Clone, Debug)]

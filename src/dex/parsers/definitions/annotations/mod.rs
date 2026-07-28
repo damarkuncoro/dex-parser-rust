@@ -5,6 +5,18 @@ use scroll::Endian;
 
 pub mod helpers;
 
+pub struct AnnotationParser;
+
+impl AnnotationParser {
+    pub fn parse<'a, R: DexResolver<'a>>(
+        reader: &mut DexReader<'a>,
+        offset: usize,
+        resolver: &R,
+    ) -> Result<AnnotationsDirectory<'a>, crate::dex::error::DexError> {
+        parse_annotations_directory_with_reader(reader, offset, resolver)
+    }
+}
+
 pub fn parse_annotations_directory<'a, R: DexResolver<'a>>(
     buffer: &'a [u8],
     offset: usize,

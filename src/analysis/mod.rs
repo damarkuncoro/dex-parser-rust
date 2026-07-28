@@ -22,7 +22,7 @@ pub use cross_ref::XrefBuilder;
 pub use cross_ref::builder::XrefVisitor;
 pub use forensics::{
     ForensicAnalyzer, EntropyAnalyzer, StringScanner,
-    BehaviorAnalyzer, BehaviorVisitor, ObfuscationVisitor
+    BehaviorAnalyzer, BehaviorVisitor, ObfuscationVisitor, ResourceVisitor
 };
 pub use global::GlobalAnalyzer;
 pub use tokens::{InstructionTokenizer, TokenizerVisitor};

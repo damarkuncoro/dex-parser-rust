@@ -22,6 +22,8 @@ pub struct ScanResult {
 pub struct AnalysisReport {
     pub forensic_gaps: Vec<GapAnalysis>,
     pub sensitive_indicators: Vec<ScanResult>,
+    pub manifest_indicators: Vec<ScanResult>,
+    pub potential_resource_ids: Vec<u32>,
     pub xrefs: XrefMap,
     pub method_tokens: HashMap<String, Vec<AnalysisToken>>,
     pub stats: AnalysisStats,
@@ -57,6 +59,8 @@ impl AnalysisReport {
         Self {
             forensic_gaps: gaps,
             sensitive_indicators: indicators,
+            manifest_indicators: Vec::new(),
+            potential_resource_ids: Vec::new(),
             xrefs,
             method_tokens,
             stats: AnalysisStats {
@@ -134,6 +138,8 @@ pub struct GlobalIntelligence {
     pub cross_dex_types: HashMap<String, Vec<CallSite>>,
     pub behavioral_indicators: Vec<ScanResult>,
     pub global_security_summary: GlobalSecuritySummary,
+    /// Maps Resource IDs found in code to their names from resources.arsc
+    pub resolved_resources: HashMap<u32, String>,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -152,6 +158,15 @@ pub struct GlobalSecuritySummary {
 }
 
 impl GlobalIntelligence {
+    /// Helper to merge all XREFs from all DEX files into a single map.
+    pub fn merge_all_xrefs(&self, apk: &crate::dex::core::models::Apk) -> XrefMap {
+        let mut total_xref = XrefMap::default();
+        for dex in &apk.dex_files {
+            total_xref.merge(dex.analysis.xrefs.clone());
+        }
+        total_xref
+    }
+
     pub fn merge(&mut self, other: GlobalIntelligence) {
         merge_hashmaps_with_vecs(&mut self.cross_dex_calls, other.cross_dex_calls);
         merge_hashmaps_with_vecs(&mut self.cross_dex_fields, other.cross_dex_fields);

@@ -1,7 +1,8 @@
 use crate::dex::error::DexError;
 use crate::dex::core::models::{EncodedMethod};
 use crate::dex::core::models::raw::RawMethodId;
-use crate::dex::parsers::{class_data, code, traits::DexResolver};
+use crate::dex::parsers::definitions::{class_data, code};
+use crate::dex::parsers::core::traits::DexResolver;
 use crate::dex::core::utils::access_flags::translate_access_flags;
 use crate::trace_parse;
 

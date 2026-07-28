@@ -1,21 +1,9 @@
-pub mod header;
-pub mod strings;
-pub mod types;
-pub mod protos;
-pub mod fields;
-pub mod methods;
-pub mod classes;
-pub mod class_data;
-pub mod code;
-pub mod traits;
-pub mod encoded_value;
-pub mod annotations;
-pub mod debug_info;
-pub mod map_list;
-pub mod map_processor;
-pub mod method_handles;
-pub mod call_sites;
+pub mod core;
+pub mod identifiers;
+pub mod definitions;
 pub mod pipeline;
+
+pub use core::traits;
 
 use crate::dex::core::constants::{offsets::ENDIAN_TAG, ENDIAN_CONSTANT};
 use crate::dex::error::DexError;

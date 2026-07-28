@@ -2,7 +2,7 @@ use crate::dex::core::models::AnnotationItem;
 use crate::dex::error::DexError;
 use crate::dex::parsers::traits::DexResolver;
 use crate::dex::readers::DexReader;
-use crate::dex::parsers::encoded_value;
+use crate::dex::parsers::definitions::encoded_value;
 use scroll::{Endian};
 
 pub fn parse_annotation_set<'a, R: DexResolver<'a>>(

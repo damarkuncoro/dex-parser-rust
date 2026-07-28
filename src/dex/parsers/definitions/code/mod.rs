@@ -2,11 +2,23 @@ use crate::dex::core::constants::sizes::CODE_ITEM_HEADER;
 use crate::dex::error::DexError;
 use crate::dex::core::instructions::decoder::InstructionDecoder;
 use crate::dex::core::models::{raw::RawCodeItem, Code};
-use crate::dex::parsers::traits::DexResolver;
-use crate::dex::parsers::debug_info;
+use crate::dex::parsers::core::traits::DexResolver;
+use crate::dex::parsers::definitions::debug_info;
 use scroll::Pread;
 
 pub mod catches;
+
+pub struct CodeParser;
+
+impl CodeParser {
+    pub fn parse<'a, R: DexResolver<'a>>(
+        reader: &mut crate::dex::readers::DexReader<'a>,
+        offset: usize,
+        resolver: &R,
+    ) -> Result<Code<'a>, DexError> {
+        parse_code_item(reader, offset, resolver)
+    }
+}
 
 pub fn parse_code_item<'a, R: DexResolver<'a>>(
     reader: &mut crate::dex::readers::DexReader<'a>,

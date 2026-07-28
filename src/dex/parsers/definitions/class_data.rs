@@ -20,6 +20,14 @@ pub struct RawEncodedMethod {
     pub code_off: u32,
 }
 
+pub struct ClassDataParser;
+
+impl ClassDataParser {
+    pub fn parse(reader: &mut DexReader, offset: usize) -> Result<RawClassData, DexError> {
+        parse_class_data(reader, offset)
+    }
+}
+
 pub fn parse_class_data(reader: &mut DexReader, offset: usize) -> Result<RawClassData, DexError> {
     reader.seek(offset)?;
 

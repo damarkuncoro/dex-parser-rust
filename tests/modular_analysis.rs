@@ -17,6 +17,7 @@ fn test_modular_pipeline_stats_and_xref() {
             resolved_value: Some("test".to_string()),
             registers: vec![0],
             target_offset: None,
+            immediates: vec![],
         },
         Instruction {
             offset: 2,
@@ -27,6 +28,7 @@ fn test_modular_pipeline_stats_and_xref() {
             resolved_value: Some("Ljava/lang/System;->out".to_string()),
             registers: vec![0],
             target_offset: None,
+            immediates: vec![],
         },
     ];
 

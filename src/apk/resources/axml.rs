@@ -148,27 +148,29 @@ impl<'a> AxmlParser<'a> {
             let attr_value = if attr_val_idx >= 0 {
                 string_pool.get(attr_val_idx as usize).cloned().unwrap_or_default()
             } else {
-                String::new()
+                let data: u32 = self.buffer.pread_with(attr_offset + 16, LE).unwrap_or(0);
+                format!("0x{:08x}", data)
             };
 
+            // Android AXML uses names with or without namespaces in the string pool.
+            // Let's be more flexible in matching.
             match name.as_str() {
                 "manifest" => {
                     if attr_name == "package" { manifest.package_name = attr_value; }
                 }
                 "uses-permission" => {
-                    if attr_name == "name" { manifest.permissions.push(attr_value); }
+                    if attr_name == "name" || attr_name.ends_with(":name") { manifest.permissions.push(attr_value); }
                 }
-                "activity" => {
-                    if attr_name == "name" { manifest.activities.push(attr_value); }
-                }
-                "service" => {
-                    if attr_name == "name" { manifest.services.push(attr_value); }
-                }
-                "receiver" => {
-                    if attr_name == "name" { manifest.receivers.push(attr_value); }
-                }
-                "provider" => {
-                    if attr_name == "name" { manifest.providers.push(attr_value); }
+                "activity" | "service" | "receiver" | "provider" => {
+                    if attr_name == "name" || attr_name.ends_with(":name") {
+                        match name.as_str() {
+                            "activity" => manifest.activities.push(attr_value),
+                            "service" => manifest.services.push(attr_value),
+                            "receiver" => manifest.receivers.push(attr_value),
+                            "provider" => manifest.providers.push(attr_value),
+                            _ => {}
+                        }
+                    }
                 }
                 _ => {}
             }

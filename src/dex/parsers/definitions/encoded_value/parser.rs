@@ -2,7 +2,7 @@ use crate::dex::core::models::{EncodedValue, EncodedAnnotation, AnnotationElemen
 use crate::dex::parsers::traits::DexResolver;
 use crate::dex::readers::DexReader;
 use crate::dex::core::constants::value_types;
-use crate::dex::parsers::encoded_value::utils;
+use super::utils;
 use crate::trace_parse;
 
 pub fn parse_encoded_value<'a, R: DexResolver<'a>>(

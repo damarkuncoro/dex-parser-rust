@@ -1,7 +1,7 @@
 use crate::analysis::{
     ForensicAnalyzer, AnalysisReport, XrefVisitor,
     BehaviorVisitor, AnalysisEngine,
-    StatsVisitor, InstructionStats, TokenizerVisitor, ObfuscationVisitor
+    StatsVisitor, InstructionStats, TokenizerVisitor, ObfuscationVisitor, ResourceVisitor
 };
 use crate::dex::core::models::Class;
 use crate::dex::core::utils::byte_tracker::ByteTracker;
@@ -40,6 +40,7 @@ pub fn run(
         Box::new(BehaviorVisitor::new(config_arc.clone())),
         Box::new(TokenizerVisitor::new(config_arc.clone())),
         Box::new(ObfuscationVisitor::new()),
+        Box::new(ResourceVisitor::new()),
     ];
 
     // Run all visitors in a single parallel pass!
@@ -73,6 +74,12 @@ pub fn run(
         .map(|v| v.results.clone())
         .unwrap_or_default();
 
+    let potential_resource_ids = results.iter()
+        .find(|v| v.as_any().is::<ResourceVisitor>())
+        .and_then(|v| v.as_any().downcast_ref::<ResourceVisitor>())
+        .map(|v| v.found_ids.keys().cloned().collect::<Vec<_>>())
+        .unwrap_or_default();
+
     // Add forensic and obfuscation indicators
     let mut final_indicators = behavioral_indicators;
     final_indicators.extend(forensic_data.1);
@@ -94,6 +101,7 @@ pub fn run(
         method_tokens,
         total_instructions
     );
+    report.potential_resource_ids = potential_resource_ids;
 
     report.stats.call_count = stats.call_count;
     report.stats.jump_count = stats.jump_count;

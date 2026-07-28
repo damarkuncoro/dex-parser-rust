@@ -52,5 +52,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     exporter.export_apk(&apk, &mut stdout, &options)?;
 
+    // 4. Export Call Graph if requested
+    if let Some(dot_path) = args.call_graph {
+        eprintln!("  [+] Exporting call graph to {}...", dot_path);
+        let mut dot_file = File::create(dot_path)?;
+        dex_parser_rust::exporter::dot::DotExporter::export_call_graph(&apk.intelligence.merge_all_xrefs(&apk), &mut dot_file)?;
+    }
+
     Ok(())
 }

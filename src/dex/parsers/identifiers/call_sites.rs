@@ -3,9 +3,9 @@ use crate::dex::core::models::raw::RawCallSiteIdItem;
 use crate::dex::readers::DexReader;
 use scroll::Pread;
 
-pub struct CallSiteParser;
+pub struct CallSiteIdParser;
 
-impl CallSiteParser {
+impl CallSiteIdParser {
     pub fn parse(reader: &mut DexReader, size: u32, offset: u32) -> Result<Vec<RawCallSiteIdItem>, DexError> {
         reader.seek(offset as usize)?;
         let mut items = Vec::with_capacity(size as usize);

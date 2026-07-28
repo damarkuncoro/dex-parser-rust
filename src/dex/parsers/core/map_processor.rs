@@ -1,11 +1,12 @@
 use crate::dex::core::models::map_list::{types as map_types, MapList};
 use crate::dex::readers::DexReader;
 use crate::dex::error::DexError;
-use crate::dex::parsers::{
+use crate::dex::parsers::identifiers::{
     strings::StringSection, types::TypeIdParser, protos::ProtoIdParser,
-    fields::FieldIdParser, methods::MethodIdParser, classes::ClassDefParser,
-    method_handles::MethodHandleParser, call_sites::CallSiteParser,
+    fields::FieldIdParser, methods::MethodIdParser,
+    method_handles::MethodHandleParser, call_sites::CallSiteIdParser,
 };
+use crate::dex::parsers::definitions::classes::ClassDefParser;
 use crate::dex::core::models::raw::{RawMethodId, RawProtoId, RawFieldId, RawClassDef, RawMethodHandleItem, RawCallSiteIdItem};
 
 pub struct MapProcessorResults {
@@ -58,7 +59,7 @@ impl MapProcessor {
                     results.method_handles = MethodHandleParser::parse(reader, item.size, item.offset)?;
                 }
                 map_types::TYPE_CALL_SITE_ID_ITEM => {
-                    results.call_sites = CallSiteParser::parse(reader, item.size, item.offset)?;
+                    results.call_sites = CallSiteIdParser::parse(reader, item.size, item.offset)?;
                 }
                 _ => {}
             }

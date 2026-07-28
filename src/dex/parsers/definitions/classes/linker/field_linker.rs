@@ -1,7 +1,7 @@
 use crate::dex::core::models::{EncodedField, Field};
-use crate::dex::parsers::class_data;
+use crate::dex::parsers::definitions::class_data;
 use crate::dex::core::utils::access_flags::translate_access_flags;
-use crate::dex::parsers::traits::StringResolver;
+use crate::dex::parsers::core::traits::StringResolver;
 
 pub fn link_fields<'a, R: StringResolver<'a>>(
     class_data_fields: &[class_data::RawEncodedField],

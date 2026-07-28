@@ -60,7 +60,18 @@ impl ApkExtractor {
         let manifest = if zip.get_file_names().contains(&"AndroidManifest.xml".to_string()) {
             callback("Extracting AndroidManifest.xml...");
             if let Ok(buf) = zip.extract_file("AndroidManifest.xml") {
-                super::manifest::ManifestParser::parse(&buf).ok()
+                super::super::resources::ManifestParser::parse(&buf).ok()
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        let resources = if zip.get_file_names().contains(&"resources.arsc".to_string()) {
+            callback("Analyzing resources.arsc...");
+            if let Ok(buf) = zip.extract_file("resources.arsc") {
+                super::super::resources::ArscParser::new(&buf).parse().ok()
             } else {
                 None
             }
@@ -73,6 +84,6 @@ impl ApkExtractor {
         }
 
         callback("Finalizing APK context...");
-        Ok(Apk::new_with_manifest(dex_files, dex_names, manifest))
+        Ok(Apk::new_full(dex_files, dex_names, manifest, resources))
     }
 }

@@ -39,6 +39,15 @@ impl Exporter for TextExporter {
             }
         }
 
+        if !apk.intelligence.resolved_resources.is_empty() {
+            writeln!(writer, "\n[Resolved Resources]")?;
+            let mut ids: Vec<_> = apk.intelligence.resolved_resources.keys().collect();
+            ids.sort();
+            for &id in ids {
+                writeln!(writer, "  0x{:08x} -> {}", id, apk.intelligence.resolved_resources[&id])?;
+            }
+        }
+
         let intel = &apk.intelligence;
 
         if options.include_analysis {

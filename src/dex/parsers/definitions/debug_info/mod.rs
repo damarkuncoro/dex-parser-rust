@@ -1,9 +1,21 @@
 use crate::dex::core::models::{DebugInfo};
-use crate::dex::parsers::traits::DexResolver;
+use crate::dex::parsers::core::traits::DexResolver;
 use crate::dex::readers::DexReader;
 use crate::trace_parse;
 
 pub mod handlers;
+
+pub struct DebugInfoParser;
+
+impl DebugInfoParser {
+    pub fn parse<'a, R: DexResolver<'a>>(
+        reader: &mut DexReader<'a>,
+        offset: usize,
+        resolver: &R,
+    ) -> Result<DebugInfo<'a>, crate::dex::error::DexError> {
+        parse_debug_info(reader, offset, resolver)
+    }
+}
 
 pub fn parse_debug_info<'a, R: DexResolver<'a>>(
     reader: &mut DexReader<'a>,
