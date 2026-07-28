@@ -1,0 +1,659 @@
+<article class="devsite-article">
+
+
+
+    <div class="devsite-banner devsite-banner-announcement nocontent" data-nosnippet="" background="light-green">
+        <div class="devsite-banner-message">
+            <div class="devsite-banner-message-text">
+                <p>Effective in 2026, to align with our trunk stable development model and ensure platform stability for the ecosystem, we will publish source code to AOSP in Q2 and Q4. For building and contributing to AOSP, use <code translate="no" dir="ltr">android-latest-release</code>. The <code translate="no" dir="ltr">android-latest-release</code> manifest branch will always reference the most recent release pushed to AOSP. For more information, see <a href="/docs/whatsnew/site-updates#aosp-changes">Changes to AOSP</a>.</p>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="devsite-article-meta nocontent" role="navigation" data-nosnippet="">
+
+
+        <ul class="devsite-breadcrumb-list" aria-label="Breadcrumb">
+
+            <li class="devsite-breadcrumb-item
+             ">
+
+
+
+
+
+                <a href="https://source.android.com/" class="devsite-breadcrumb-link gc-analytics-event" data-category="Site-Wide Custom Events" data-label="Breadcrumbs" data-value="1" track-type="globalNav" track-name="breadcrumb" track-metadata-position="1" track-metadata-eventdetail="Android Open Source Project">
+
+                    AOSP
+
+                </a>
+
+
+
+            </li>
+
+            <li class="devsite-breadcrumb-item
+             ">
+
+
+                <div class="devsite-breadcrumb-guillemet material-icons" aria-hidden="true"></div>
+
+
+
+
+
+                <a href="https://source.android.com/docs" class="devsite-breadcrumb-link gc-analytics-event" data-category="Site-Wide Custom Events" data-label="Breadcrumbs" data-value="2" track-type="globalNav" track-name="breadcrumb" track-metadata-position="2" track-metadata-eventdetail="">
+
+                    Docs
+
+                </a>
+
+
+
+            </li>
+
+            <li class="devsite-breadcrumb-item
+             ">
+
+
+                <div class="devsite-breadcrumb-guillemet material-icons" aria-hidden="true"></div>
+
+
+
+
+
+                <a href="https://source.android.com/docs/core" class="devsite-breadcrumb-link gc-analytics-event" data-category="Site-Wide Custom Events" data-label="Breadcrumbs" data-value="3" track-type="globalNav" track-name="breadcrumb" track-metadata-position="3" track-metadata-eventdetail="">
+
+                    Core Topics
+
+                </a>
+
+
+
+            </li>
+
+        </ul>
+
+
+        <devsite-thumb-rating position="header"><div class="devsite-thumb-rating" role="form" aria-labelledby="devsite-thumb-label-header"><div class="devsite-thumb-label" id="devsite-thumb-label-header">Was this helpful?</div><div class="devsite-thumbs"><button class="devsite-thumb devsite-thumb-up" data-title="Helpful" aria-label="Helpful"><svg class="devsite-thumb-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21,7h-6.31l0.95-4.57l0.03-0.32c0-0.41-0.17-0.79-0.44-1.06L14.17,0c0,0-7.09,6.85-7.17,7H2v13h16 c0.83,0,1.54-0.5,1.84-1.22l3.02-7.05C22.95,11.5,23,11.26,23,11V9C23,7.9,22.1,7,21,7z M7,18H4V9h3V18z M21,11l-3,7H9V8l4.34-4.34 L12,9h9V11z"></path></svg></button><button class="devsite-thumb devsite-thumb-down" data-title="Not helpful" aria-label="Not helpful"><svg class="devsite-thumb-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3,17h6.31l-0.95,4.57l-0.03,0.32c0,0.41,0.17,0.79,0.44,1.06L9.83,24c0,0,7.09-6.85,7.17-7h5V4H6 C5.17,4,4.46,4.5,4.16,5.22l-3.02,7.05C1.05,12.5,1,12.74,1,13v2C1,16.1,1.9,17,3,17z M17,6h3v9h-3V6z M3,13l3-7h9v10l-4.34,4.34 L12,15H3V13z"></path></svg></button></div></div></devsite-thumb-rating>
+
+
+    </div>
+
+    <h1 class="devsite-page-title" tabindex="-1">
+        Dalvik executable instruction formats<devsite-actions data-nosnippet=""><devsite-feature-tooltip ack-key="AckCollectionsBookmarkTooltipDismiss" analytics-category="Site-Wide Custom Events" analytics-action-show="Callout Profile displayed" analytics-action-close="Callout Profile dismissed" analytics-label="Create Collection Callout" class="devsite-page-bookmark-tooltip nocontent inline-block" data-nosnippet="" dismiss-button="true" id="devsite-collections-dropdown" dismiss-button-text="Dismiss" close-button-text="Got it" rendered="" current-step="0" style="--devsite-popout-offset-x: 32px;"><template shadowrootmode="open"><!---->
+        <!--?lit$170428075$-->
+        <slot></slot>
+        <div class="parent" hidden="">
+            <div class="popout">
+                <slot name="popout-heading"></slot>
+                <slot name="popout-contents"></slot>
+                <div class="controls">
+                    <!--?lit$170428075$-->
+                    <!--?lit$170428075$-->
+                    <div class="buttons-container">
+                        <!--?lit$170428075$-->
+                        <button class="dismiss-button button button-flat">
+                            <!--?lit$170428075$-->Dismiss
+                        </button>
+                        <!--?lit$170428075$-->
+                        <!--?lit$170428075$-->
+                        <button class="close-button button ">
+                            <!--?lit$170428075$-->Got it
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+            <svg class="notch" width="18" height="14" viewBox="0 0 18 14" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.15882 1.3085C8.55246 0.696177 9.44754 0.696177 9.84118 1.3085L18 14L0 14L8.15882 1.3085Z"></path>
+            </svg>
+        </div></template>
+
+
+
+        <devsite-bookmark class="show"><devsite-dropdown-list aria-label="Bookmark collections drop down" role="listbox" ellipsis="" checkboxes="" fetchingitems="true" writable="" additemtext="New Collection" rendered=""><template shadowrootmode="open"><!----> <button class="toggle-button button" aria-haspopup="menu" id="dropdown-list-0-toggle" aria-controls="dropdown-list-0-dropdown" aria-expanded="false" aria-label="Open dropdown">
+            <slot name="toggle"></slot>
+        </button>
+            <!--?lit$170428075$--><!--?--></template><span data-label="devsite-bookmark-direct-action" data-title="Save page" class="material-icons bookmark-icon bookmark-action" slot="toggle"></span><span data-label="devsite-bookmark-direct-action" data-title="Unsave page" hidden="" class="material-icons bookmark-icon unbookmark-action toggled" slot="toggle"></span></devsite-dropdown-list></devsite-bookmark>
+
+
+        <span slot="popout-heading">
+
+      Stay organized with collections
+    </span>
+        <span slot="popout-contents">
+
+      Save and categorize content based on your preferences.<wbr>
+    </span>
+    </devsite-feature-tooltip><!----></devsite-actions>
+
+
+    </h1>
+    <div class="devsite-page-title-meta"></div>
+
+
+    <devsite-toc class="devsite-nav devsite-toc-embedded" depth="2" devsite-toc-embedded="" visible=""><ul class="devsite-nav-list"><li class="devsite-nav-item devsite-nav-heading devsite-toc-toggle"><span class="devsite-nav-title" role="heading" aria-level="2"><span class="devsite-nav-text">On this page</span></span><button type="button" title="Expand/collapse contents" class="devsite-nav-show-all button-transparent material-icons"></button></li><li class="devsite-nav-item" visible=""><a href="#bitwise" class="devsite-nav-title gc-analytics-event" data-category="Site-Wide Custom Events" data-action="click" data-label="Embedded nav" data-value="0" track-type="navigation" track-name="embeddedNav" track-metadata-position="0" track-metadata-link-destination="#bitwise"><span class="devsite-nav-text" tooltip="">Bitwise descriptions</span></a></li><li class="devsite-nav-item" visible=""><a href="#format-ids" class="devsite-nav-title gc-analytics-event" data-category="Site-Wide Custom Events" data-action="click" data-label="Embedded nav" data-value="1" track-type="navigation" track-name="embeddedNav" track-metadata-position="1" track-metadata-link-destination="#format-ids"><span class="devsite-nav-text" tooltip="">Format IDs</span></a></li><li class="devsite-nav-item" visible=""><a href="#syntax" class="devsite-nav-title gc-analytics-event" data-category="Site-Wide Custom Events" data-action="click" data-label="Embedded nav" data-value="2" track-type="navigation" track-name="embeddedNav" track-metadata-position="2" track-metadata-link-destination="#syntax"><span class="devsite-nav-text" tooltip="">Syntax</span></a></li><li class="devsite-nav-item" visible=""><a href="#formats" class="devsite-nav-title gc-analytics-event" data-category="Site-Wide Custom Events" data-action="click" data-label="Embedded nav" data-value="3" track-type="navigation" track-name="embeddedNav" track-metadata-position="3" track-metadata-link-destination="#formats"><span class="devsite-nav-text" tooltip="">Formats</span></a></li><li class="devsite-toc-toggle"><button type="button" class="button-flat devsite-nav-more-items material-icons" track-type="navigation" track-name="embeddedNavExpand" title="Expand/collapse contents"></button></li></ul></devsite-toc>
+
+
+    <div class="devsite-article-body clearfix
+  ">
+
+
+
+
+        <!--
+            Copyright 2018 The Android Open Source Project
+
+            Licensed under the Apache License, Version 2.0 (the "License");
+            you may not use this file except in compliance with the License.
+            You may obtain a copy of the License at
+
+                http://www.apache.org/licenses/LICENSE-2.0
+
+            Unless required by applicable law or agreed to in writing, software
+            distributed under the License is distributed on an "AS IS" BASIS,
+            WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+            See the License for the specific language governing permissions and
+            limitations under the License.
+        -->
+
+
+
+        <p>This page lists the instruction formats used by the Dalvik executable (DEX)
+            format and Dalvik bytecode. It is meant to be used in conjunction with the
+            <a href="/docs/core/runtime/dalvik-bytecode">bytecode reference document</a>.</p>
+
+        <h2 id="bitwise" data-text="Bitwise descriptions" tabindex="-1" role="presentation"><span class="devsite-heading" role="heading" aria-level="2">Bitwise descriptions</span><button type="button" class="devsite-heading-link button-flat material-icons" aria-label="Copy link to this section: Bitwise descriptions" data-title="Copy link to this section: Bitwise descriptions" data-id="bitwise"></button></h2>
+
+        <p>The first column in the format table lists the bitwise layout of
+            the format. It consists of one or more space-separated "words" each of
+            which describes a 16-bit code unit. Each character in a word
+            represents four bits, read from high bits to low, with vertical bars
+            ("<code translate="no" dir="ltr">|</code>") interspersed to aid in reading. Uppercase letters
+            in sequence from "<code translate="no" dir="ltr">A</code>" are used to indicate fields within
+            the format (which then get defined further by the syntax column). The term
+            "<code translate="no" dir="ltr">op</code>" is used to indicate the position of an eight-bit
+            opcode within the format. A slashed zero
+            ("<code translate="no" dir="ltr">Ø</code>") is used to indicate that all bits must be
+            zero in the indicated position.</p>
+
+        <p>For the most part, lettering proceeds from earlier code units to
+            later code units, and low-order to high-order within a code unit.
+            However, there are a few exceptions to this general rule, which are
+            done in order to make the naming of similar-meaning parts be the same
+            across different instruction formats. These cases are noted explicitly
+            in the format descriptions.</p>
+
+        <p>For example, the format "<code translate="no" dir="ltr">B|A|<i>op</i> CCCC</code>" indicates
+            that the format consists of two 16-bit code units. The first word
+            consists of the opcode in the low eight bits and a pair of four-bit
+            values in the high eight bits; and the second word consists of a single
+            16-bit value.</p>
+
+        <h2 id="format-ids" data-text="Format IDs" tabindex="-1" role="presentation"><span class="devsite-heading" role="heading" aria-level="2">Format IDs</span><button type="button" class="devsite-heading-link button-flat material-icons" aria-label="Copy link to this section: Format IDs" data-title="Copy link to this section: Format IDs" data-id="format-ids"></button></h2>
+
+        <p>The second column in the format table indicates the short identifier
+            for the format, which is used in other documents and in code to identify
+            the format.</p>
+
+        <p>Most format IDs consist of three characters, two digits followed by a
+            letter. The first digit indicates the number of 16-bit code units in the
+            format. The second digit indicates the maximum number of registers that the
+            format contains (maximum, since some formats can accommodate a variable
+            number of registers), with the special designation "<code translate="no" dir="ltr">r</code>" indicating
+            that a range of registers is encoded. The final letter semi-mnemonically
+            indicates the type of any extra data encoded by the format. For example,
+            format "<code translate="no" dir="ltr">21t</code>" is of length two, contains one register reference,
+            and additionally contains a branch target.</p>
+
+        <p>Suggested static linking formats have an additional
+            "<code translate="no" dir="ltr">s</code>" suffix, making them four characters total. Similarly,
+            suggested "inline" linking formats have an additional "<code translate="no" dir="ltr">i</code>"
+            suffix. (In this context, inline linking is like static linking,
+            except with more direct ties into a machine's implementation.)
+            Finally, a couple oddball suggested formats (e.g.,
+            "<code translate="no" dir="ltr">20bc</code>") include two pieces of data which are both
+            represented in its format ID.</p>
+
+        <p>The full list of typecode letters are as follows. Note that some
+            forms have different sizes, depending on the format:</p>
+
+        <div class="devsite-table-wrapper"><table class="letters">
+            <thead>
+            <tr>
+                <th>Mnemonic</th>
+                <th>Bit Sizes</th>
+                <th>Meaning</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>b</td>
+                <td>8</td>
+                <td>immediate signed <b>b</b>yte</td>
+            </tr>
+            <tr>
+                <td>c</td>
+                <td>16, 32</td>
+                <td><b>c</b>onstant pool index</td>
+            </tr>
+            <tr>
+                <td>f</td>
+                <td>16</td>
+                <td>inter<b>f</b>ace constants (only used in statically linked formats)
+                </td>
+            </tr>
+            <tr>
+                <td>h</td>
+                <td>16</td>
+                <td>immediate signed <b>h</b>at (high-order bits of a 32- or 64-bit
+                    value; low-order bits are all <code translate="no" dir="ltr">0</code>)
+                </td>
+            </tr>
+            <tr>
+                <td>i</td>
+                <td>32</td>
+                <td>immediate signed <b>i</b>nt, or 32-bit float</td>
+            </tr>
+            <tr>
+                <td>l</td>
+                <td>64</td>
+                <td>immediate signed <b>l</b>ong, or 64-bit double</td>
+            </tr>
+            <tr>
+                <td>m</td>
+                <td>16</td>
+                <td><b>m</b>ethod constants (only used in statically linked formats)</td>
+            </tr>
+            <tr>
+                <td>n</td>
+                <td>4</td>
+                <td>immediate signed <b>n</b>ibble</td>
+            </tr>
+            <tr>
+                <td>s</td>
+                <td>16</td>
+                <td>immediate signed <b>s</b>hort</td>
+            </tr>
+            <tr>
+                <td>t</td>
+                <td>8, 16, 32</td>
+                <td>branch <b>t</b>arget</td>
+            </tr>
+            <tr>
+                <td>x</td>
+                <td>0</td>
+                <td>no additional data</td>
+            </tr>
+            </tbody>
+        </table></div>
+
+        <h2 id="syntax" data-text="Syntax" tabindex="-1" role="presentation"><span class="devsite-heading" role="heading" aria-level="2">Syntax</span><button type="button" class="devsite-heading-link button-flat material-icons" aria-label="Copy link to this section: Syntax" data-title="Copy link to this section: Syntax" data-id="syntax"></button></h2>
+
+        <p>The third column of the format table indicates the human-oriented
+            syntax for instructions which use the indicated format. Each instruction
+            starts with the named opcode and is optionally followed by one or
+            more arguments, themselves separated with commas.</p>
+
+        <p>Wherever an argument refers to a field from the first column, the
+            letter for that field is indicated in the syntax, repeated once for
+            each four bits of the field. For example, an eight-bit field labeled
+            "<code translate="no" dir="ltr">BB</code>" in the first column would also be labeled
+            "<code translate="no" dir="ltr">BB</code>" in the syntax column.</p>
+
+        <p>Arguments which name a register have the form "<code translate="no" dir="ltr">v<i>X</i></code>".
+            The prefix "<code translate="no" dir="ltr">v</code>" was chosen instead of the more common
+            "<code translate="no" dir="ltr">r</code>" exactly to avoid conflicting with (non-virtual) architectures
+            on which the Dalvik Executable format might be implemented which themselves
+            use the prefix "<code translate="no" dir="ltr">r</code>" for their registers. (That is, this
+            decision makes it possible to talk about both virtual and real registers
+            together without the need for circumlocution.)</p>
+
+        <p>Arguments which indicate a literal value have the form
+            "<code translate="no" dir="ltr">#+<i>X</i></code>". Some formats indicate literals that only
+            have non-zero bits in their high-order bits; for these, the zeroes
+            are represented explicitly in the syntax, even though they do not
+            appear in the bitwise representation.</p>
+
+        <p>Arguments which indicate a relative instruction address offset have the
+            form "<code translate="no" dir="ltr">+<i>X</i></code>".</p>
+
+        <p>Arguments which indicate a literal constant pool index have the form
+            "<code translate="no" dir="ltr"><i>kind</i>@<i>X</i></code>", where "<code translate="no" dir="ltr"><i>kind</i></code>"
+            indicates which constant pool is being referred to. Each opcode that
+            uses such a format explicitly allows only one kind of constant; see
+            the opcode reference to figure out the correspondence. The
+            kinds of constant pool are "<code translate="no" dir="ltr">string</code>" (string pool index),
+            "<code translate="no" dir="ltr">type</code>" (type pool index), "<code translate="no" dir="ltr">field</code>" (field
+            pool index), "<code translate="no" dir="ltr">meth</code>" (method pool index), and
+            "<code translate="no" dir="ltr">site</code>" (call site index).</p>
+
+        <p>Similar to the representation of constant pool indices, there are
+            also suggested (optional) forms that indicate prelinked offsets or
+            indices. There are two types of suggested prelinked value: vtable offsets
+            (indicated as "<code translate="no" dir="ltr">vtaboff</code>") and field offsets (indicated as
+            "<code translate="no" dir="ltr">fieldoff</code>").</p>
+
+        <p>In the cases where a format value isn't explicitly part of the syntax
+            but instead picks a variant, each variant is listed with the prefix
+            "<code translate="no" dir="ltr">[<i>X</i>=<i>N</i>]</code>" (e.g., "<code translate="no" dir="ltr">[A=2]</code>") to indicate
+            the correspondence.</p>
+
+        <h2 id="formats" data-text="Formats" tabindex="-1" role="presentation"><span class="devsite-heading" role="heading" aria-level="2">Formats</span><button type="button" class="devsite-heading-link button-flat material-icons" aria-label="Copy link to this section: Formats" data-title="Copy link to this section: Formats" data-id="formats"></button></h2>
+
+        <div class="devsite-table-wrapper"><table class="format">
+            <thead>
+            <tr>
+                <th>Format</th>
+                <th>ID</th>
+                <th>Syntax</th>
+                <th>Notable Opcodes Covered</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><i>N/A</i></td>
+                <td>00x</td>
+                <td><i><code translate="no" dir="ltr">N/A</code></i></td>
+                <td><i>pseudo-format used for unused opcodes; suggested for use as the
+                    nominal format for a breakpoint opcode</i></td>
+            </tr>
+            <tr>
+                <td>ØØ|<i>op</i></td>
+                <td>10x</td>
+                <td><i><code translate="no" dir="ltr">op</code></i></td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td rowspan="2">B|A|<i>op</i></td>
+                <td>12x</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vA, vB</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>11n</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vA, #+B</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td rowspan="2">AA|<i>op</i></td>
+                <td>11x</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>10t</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> +AA</td>
+                <td>goto</td>
+            </tr>
+            <tr>
+                <td>ØØ|<i>op</i> AAAA</td>
+                <td>20t</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> +AAAA</td>
+                <td>goto/16</td>
+            </tr>
+            <tr>
+                <td>AA|<i>op</i> BBBB</td>
+                <td>20bc</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> AA, kind@BBBB</td>
+                <td><i>suggested format for statically determined verification errors;
+                    A is the type of error and B is an index into a type-appropriate
+                    table (e.g. method references for a no-such-method error)</i></td>
+            </tr>
+            <tr>
+                <td rowspan="5">AA|<i>op</i> BBBB</td>
+                <td>22x</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, vBBBB</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>21t</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, +BBBB</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>21s</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, #+BBBB</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>21h</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, #+BBBB0000<br>
+                    <i><code translate="no" dir="ltr">op</code></i> vAA, #+BBBB000000000000
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>21c</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, type@BBBB<br>
+                    <i><code translate="no" dir="ltr">op</code></i> vAA, field@BBBB<br>
+                    <i><code translate="no" dir="ltr">op</code></i> vAA, method_handle@BBBB<br>
+                    <i><code translate="no" dir="ltr">op</code></i> vAA, proto@BBBB<br>
+                    <i><code translate="no" dir="ltr">op</code></i> vAA, string@BBBB
+                </td>
+                <td>check-cast<br>
+                    const-class<br>
+                    const-method-handle<br>
+                    const-method-type<br>
+                    const-string
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2">AA|<i>op</i> CC|BB</td>
+                <td>23x</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, vBB, vCC</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>22b</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, vBB, #+CC</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td rowspan="4">B|A|<i>op</i> CCCC</td>
+                <td>22t</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vA, vB, +CCCC</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>22s</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vA, vB, #+CCCC</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>22c</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vA, vB, type@CCCC<br>
+                    <i><code translate="no" dir="ltr">op</code></i> vA, vB, field@CCCC
+                </td>
+                <td>instance-of</td>
+            </tr>
+            <tr>
+                <td>22cs</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vA, vB, fieldoff@CCCC</td>
+                <td><i>suggested format for statically linked field access instructions of
+                    format 22c</i>
+                </td>
+            </tr>
+            <tr>
+                <td>ØØ|<i>op</i> AAAA<sub>lo</sub> AAAA<sub>hi</sub></td>
+                <td>30t</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> +AAAAAAAA</td>
+                <td>goto/32</td>
+            </tr>
+            <tr>
+                <td>ØØ|<i>op</i> AAAA BBBB</td>
+                <td>32x</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAAAA, vBBBB</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td rowspan="3">AA|<i>op</i> BBBB<sub>lo</sub> BBBB<sub>hi</sub></td>
+                <td>31i</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, #+BBBBBBBB</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>31t</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, +BBBBBBBB</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>31c</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, string@BBBBBBBB</td>
+                <td>const-string/jumbo</td>
+            </tr>
+            <tr>
+                <td rowspan="3">A|G|<i>op</i> BBBB F|E|D|C</td>
+                <td>35c</td>
+                <td><i>[<code translate="no" dir="ltr">A=5</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF, vG},
+                    meth@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=5</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF, vG},
+                    site@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=5</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF, vG},
+                    type@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=4</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF},
+                    <i><code translate="no" dir="ltr">kind</code></i>@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=3</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE},
+                    <i><code translate="no" dir="ltr">kind</code></i>@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=2</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD},
+                    <i><code translate="no" dir="ltr">kind</code></i>@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=1</code>] <code translate="no" dir="ltr">op</code></i> {vC},
+                    <i><code translate="no" dir="ltr">kind</code></i>@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=0</code>] <code translate="no" dir="ltr">op</code></i> {},
+                    <i><code translate="no" dir="ltr">kind</code></i>@BBBB<br>
+                    <p><i>The unusual choice in lettering here reflects a desire to make
+                        the count and the reference index have the same label as in format
+                        3rc.</i></p>
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>35ms</td>
+                <td><i>[<code translate="no" dir="ltr">A=5</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF, vG},
+                    vtaboff@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=4</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF},
+                    vtaboff@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=3</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE},
+                    vtaboff@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=2</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD},
+                    vtaboff@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=1</code>] <code translate="no" dir="ltr">op</code></i> {vC},
+                    vtaboff@BBBB<br>
+                    <p><i>The unusual choice in lettering here reflects a desire to make
+                        the count and the reference index have the same label as in format
+                        3rms.</i></p>
+                </td>
+                <td><i>suggested format for statically linked <code translate="no" dir="ltr">invoke-virtual</code>
+                    and <code translate="no" dir="ltr">invoke-super</code> instructions of format 35c</i>
+                </td>
+            </tr>
+            <tr>
+                <td>35mi</td>
+                <td><i>[<code translate="no" dir="ltr">A=5</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF, vG},
+                    inline@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=4</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF},
+                    inline@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=3</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE},
+                    inline@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=2</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD},
+                    inline@BBBB<br>
+                    <i>[<code translate="no" dir="ltr">A=1</code>] <code translate="no" dir="ltr">op</code></i> {vC},
+                    inline@BBBB<br>
+                    <p><i>The unusual choice in lettering here reflects a desire to make
+                        the count and the reference index have the same label as in format
+                        3rmi.</i></p>
+                </td>
+                <td><i>suggested format for inline linked <code translate="no" dir="ltr">invoke-static</code>
+                    and <code translate="no" dir="ltr">invoke-virtual</code> instructions of format 35c</i>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="3">AA|<i>op</i> BBBB CCCC</td>
+                <td>3rc</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> {vCCCC .. vNNNN}, meth@BBBB<br>
+                    <i><code translate="no" dir="ltr">op</code></i> {vCCCC .. vNNNN}, site@BBBB<br>
+                    <i><code translate="no" dir="ltr">op</code></i> {vCCCC .. vNNNN}, type@BBBB<br>
+                    <p><i>where <code translate="no" dir="ltr">NNNN = CCCC+AA-1</code>, that is <code translate="no" dir="ltr">A</code>
+                        determines the count <code translate="no" dir="ltr">0..255</code>, and <code translate="no" dir="ltr">C</code>
+                        determines the first register</i></p>
+                </td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>3rms</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> {vCCCC .. vNNNN}, vtaboff@BBBB<br>
+                    <p><i>where <code translate="no" dir="ltr">NNNN = CCCC+AA-1</code>, that is <code translate="no" dir="ltr">A</code>
+                        determines the count <code translate="no" dir="ltr">0..255</code>, and <code translate="no" dir="ltr">C</code>
+                        determines the first register</i></p>
+                </td>
+                <td><i>suggested format for statically linked <code translate="no" dir="ltr">invoke-virtual</code>
+                    and <code translate="no" dir="ltr">invoke-super</code> instructions of format <code translate="no" dir="ltr">3rc</code></i>
+                </td>
+            </tr>
+            <tr>
+                <td>3rmi</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> {vCCCC .. vNNNN}, inline@BBBB<br>
+                    <p><i>where <code translate="no" dir="ltr">NNNN = CCCC+AA-1</code>, that is <code translate="no" dir="ltr">A</code>
+                        determines the count <code translate="no" dir="ltr">0..255</code>, and <code translate="no" dir="ltr">C</code>
+                        determines the first register</i></p>
+                </td>
+                <td><i>suggested format for inline linked <code translate="no" dir="ltr">invoke-static</code>
+                    and <code translate="no" dir="ltr">invoke-virtual</code> instructions of format 3rc</i>
+                </td>
+            </tr>
+            <tr>
+                <td>A|G|<i>op</i> BBBB F|E|D|C HHHH
+                </td><td>45cc</td>
+                <td>
+                    <i>[<code translate="no" dir="ltr">A=5</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF, vG}, meth@BBBB, proto@HHHH<br>
+                    <i>[<code translate="no" dir="ltr">A=4</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE, vF}, meth@BBBB, proto@HHHH<br>
+                    <i>[<code translate="no" dir="ltr">A=3</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD, vE}, meth@BBBB, proto@HHHH<br>
+                    <i>[<code translate="no" dir="ltr">A=2</code>] <code translate="no" dir="ltr">op</code></i> {vC, vD}, meth@BBBB, proto@HHHH<br>
+                    <i>[<code translate="no" dir="ltr">A=1</code>] <code translate="no" dir="ltr">op</code></i> {vC}, meth@BBBB, proto@HHHH
+                </td>
+                <td>invoke-polymorphic
+                </td>
+            </tr>
+            <tr>
+                <td>AA|<i>op</i> BBBB CCCC HHHH
+                </td><td>4rcc</td>
+                <td>
+                    <code translate="no" dir="ltr">op&gt;</code> {vCCCC .. vNNNN}, meth@BBBB, proto@HHHH
+                    <p><i>where <code translate="no" dir="ltr">NNNN = CCCC+AA-1</code>, that is <code translate="no" dir="ltr">A</code>
+                        determines the count <code translate="no" dir="ltr">0..255</code>, and <code translate="no" dir="ltr">C</code>
+                        determines the first register</i></p>
+                </td>
+                <td>invoke-polymorphic/range
+                </td>
+            </tr>
+            <tr>
+                <td>AA|<i>op</i> BBBB<sub>lo</sub> BBBB BBBB BBBB<sub>hi</sub></td>
+                <td>51l</td>
+                <td><i><code translate="no" dir="ltr">op</code></i> vAA, #+BBBBBBBBBBBBBBBB</td>
+                <td>const-wide</td>
+            </tr>
+            </tbody>
+        </table></div>
+
+
+
+
+
+    </div>
+
+
+
+
+
+    <devsite-thumb-rating position="footer"><div class="devsite-thumb-rating" role="form" aria-labelledby="devsite-thumb-label-footer"><div class="devsite-thumb-label" id="devsite-thumb-label-footer">Was this helpful?</div><div class="devsite-thumbs"><button class="devsite-thumb devsite-thumb-up" data-title="Helpful" aria-label="Helpful"><svg class="devsite-thumb-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21,7h-6.31l0.95-4.57l0.03-0.32c0-0.41-0.17-0.79-0.44-1.06L14.17,0c0,0-7.09,6.85-7.17,7H2v13h16 c0.83,0,1.54-0.5,1.84-1.22l3.02-7.05C22.95,11.5,23,11.26,23,11V9C23,7.9,22.1,7,21,7z M7,18H4V9h3V18z M21,11l-3,7H9V8l4.34-4.34 L12,9h9V11z"></path></svg></button><button class="devsite-thumb devsite-thumb-down" data-title="Not helpful" aria-label="Not helpful"><svg class="devsite-thumb-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3,17h6.31l-0.95,4.57l-0.03,0.32c0,0.41,0.17,0.79,0.44,1.06L9.83,24c0,0,7.09-6.85,7.17-7h5V4H6 C5.17,4,4.46,4.5,4.16,5.22l-3.02,7.05C1.05,12.5,1,12.74,1,13v2C1,16.1,1.9,17,3,17z M17,6h3v9h-3V6z M3,13l3-7h9v10l-4.34,4.34 L12,15H3V13z"></path></svg></button></div></div></devsite-thumb-rating>
+
+
+
+
+
+
+    <div class="devsite-floating-action-buttons"></div></article>

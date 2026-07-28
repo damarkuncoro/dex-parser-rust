@@ -3,6 +3,61 @@ use crate::dex::parsers::traits::DexResolver;
 use crate::dex::core::utils::mutf8::Mutf8Display;
 use scroll::{Endian, Pread};
 
+pub fn extract_branch_target(description: &str, op_unit: u16, units: &[u16]) -> Option<i32> {
+    if description.contains("+CCCC") {
+        Some(units.get(1).cloned().unwrap_or(0) as i16 as i32)
+    } else if description.contains("+BBBB") {
+        Some(units.get(1).cloned().unwrap_or(0) as i16 as i32)
+    } else if description.contains("+AA") {
+        Some(((op_unit >> 8) & 0xff) as i8 as i32)
+    } else {
+        None
+    }
+}
+
+pub fn extract_registers(description: &str, op_unit: u16, units: &[u16]) -> Vec<u16> {
+    let mut regs = Vec::new();
+    if description.contains("{vC..vG}") {
+        let count = ((op_unit >> 12) & 0xf) as usize;
+        let g = (op_unit >> 8) & 0xf;
+        let regs_unit = units.get(2).cloned().unwrap_or(0);
+        let c = regs_unit & 0xf;
+        let d = (regs_unit >> 4) & 0xf;
+        let e = (regs_unit >> 8) & 0xf;
+        let f = (regs_unit >> 12) & 0xf;
+
+        if count > 0 { regs.push(c); }
+        if count > 1 { regs.push(d); }
+        if count > 2 { regs.push(e); }
+        if count > 3 { regs.push(f); }
+        if count > 4 { regs.push(g); }
+    } else if description.contains("{vCCCC..vNNNN}") {
+        let count = (op_unit >> 8) & 0xff;
+        let start = units.get(2).cloned().unwrap_or(0);
+        for i in 0..count {
+            regs.push(start.wrapping_add(i as u16));
+        }
+    } else {
+        // vAAAA
+        if description.contains("vAAAA") {
+            regs.push(units.get(1).cloned().unwrap_or(0));
+        } else {
+            // vAA
+            if description.contains("vAA") {
+                regs.push((op_unit >> 8) & 0xff);
+                if description.matches("vAA").count() > 1 || description.contains("vBB") {
+                     if let Some(v) = units.get(1) { regs.push(v & 0xff); }
+                }
+            } else {
+                // vA, vB, vC
+                if description.contains("vA") { regs.push((op_unit >> 8) & 0xf); }
+                if description.contains("vB") { regs.push((op_unit >> 12) & 0xf); }
+            }
+        }
+    }
+    regs
+}
+
 pub fn substitute_special(description: &mut String, op_unit: u16, units: &[u16]) {
     if description.contains("{vC..vG}") {
         let count = (op_unit >> 12) & 0xf;
@@ -97,6 +152,9 @@ pub fn resolve_xref<'a, R: DexResolver<'a>>(
         IndexType::Field => resolver.resolve_field(index)
             .map(|f| format!("{}->{}:{}", f.class, f.name, f.type_name))
             .unwrap_or_else(|| format!("field@{:04x}", index)),
+        IndexType::CallSite => format!("call_site@{:04x}", index),
+        IndexType::MethodHandle => format!("method_handle@{:04x}", index),
+        IndexType::Proto => format!("proto@{:04x}", index),
         IndexType::None => String::new(),
     };
 
@@ -104,6 +162,9 @@ pub fn resolve_xref<'a, R: DexResolver<'a>>(
     else if description.contains("type@") { *description = description.replace("type@", &format!("{}", resolved)); }
     else if description.contains("meth@") { *description = description.replace("meth@", &format!("{}", resolved)); }
     else if description.contains("field@") { *description = description.replace("field@", &format!("{}", resolved)); }
+    else if description.contains("call_site@") { *description = description.replace("call_site@", &format!("{}", resolved)); }
+    else if description.contains("method_handle@") { *description = description.replace("method_handle@", &format!("{}", resolved)); }
+    else if description.contains("proto@") { *description = description.replace("proto@", &format!("{}", resolved)); }
     else if index_type != IndexType::None { *description = format!("{} {}", description, resolved); }
 
     resolved

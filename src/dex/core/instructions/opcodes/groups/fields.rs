@@ -31,6 +31,28 @@ pub fn get(opcode: u8) -> Option<OpcodeData> {
         0x6b => Some(("sput-byte", "vAA, field@", 2, IndexType::Field)),
         0x6c => Some(("sput-char", "vAA, field@", 2, IndexType::Field)),
         0x6d => Some(("sput-short", "vAA, field@", 2, IndexType::Field)),
+
+        // Advanced/Volatile/Quicken (API level 1+)
+        0xe3 => Some(("iget-volatile", "vA, vB, field@", 2, IndexType::Field)),
+        0xe4 => Some(("iput-volatile", "vA, vB, field@", 2, IndexType::Field)),
+        0xe5 => Some(("sget-volatile", "vAA, field@", 2, IndexType::Field)),
+        0xe6 => Some(("sput-volatile", "vAA, field@", 2, IndexType::Field)),
+        0xe7 => Some(("iget-object-volatile", "vA, vB, field@", 2, IndexType::Field)),
+
+        0xe8 => Some(("iget-wide-volatile", "vA, vB, field@", 2, IndexType::Field)),
+        0xe9 => Some(("iput-wide-volatile", "vA, vB, field@", 2, IndexType::Field)),
+        0xea => Some(("sget-wide-volatile", "vAA, field@", 2, IndexType::Field)),
+        0xeb => Some(("sput-wide-volatile", "vAA, field@", 2, IndexType::Field)),
+
+        0xf0 => Some(("iput-object-volatile", "vA, vB, field@", 2, IndexType::Field)),
+        0xf1 => Some(("sget-object-volatile", "vAA, field@", 2, IndexType::Field)),
+
+        0xf2 => Some(("iget-quick", "vA, vB, offset@", 2, IndexType::None)),
+        0xf3 => Some(("iget-wide-quick", "vA, vB, offset@", 2, IndexType::None)),
+        0xf4 => Some(("iget-object-quick", "vA, vB, offset@", 2, IndexType::None)),
+        0xf5 => Some(("iput-quick", "vA, vB, offset@", 2, IndexType::None)),
+        0xf6 => Some(("iput-wide-quick", "vA, vB, offset@", 2, IndexType::None)),
+        0xf7 => Some(("iput-object-quick", "vA, vB, offset@", 2, IndexType::None)),
         _ => None,
     }
 }

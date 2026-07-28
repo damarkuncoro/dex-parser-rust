@@ -32,6 +32,9 @@ pub enum DexError {
     #[error("Parsing error: {0}")]
     ScrollError(#[from] scroll::Error),
 
+    #[error("ZIP error: {0}")]
+    ZipError(String),
+
     #[error("Invalid UTF-8 encoding: {0}")]
     Utf8Error(#[from] std::str::Utf8Error),
 

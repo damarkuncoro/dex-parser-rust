@@ -1,11 +1,13 @@
 use serde::Serialize;
-use crate::dex::analysis::scanner::ScanResult;
+use crate::dex::analysis::ScanResult;
 
 #[derive(Serialize)]
 pub struct DexSummary {
     pub name: String,
     pub magic: String,
     pub class_count: usize,
+    pub method_count: usize,
+    pub instruction_count: usize,
     pub gap_count: usize,
     pub total_gap_size: usize,
     pub suspicious_gap_count: usize,

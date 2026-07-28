@@ -15,8 +15,12 @@ pub fn get(opcode: u8) -> Option<OpcodeData> {
         0x78 => Some(("invoke-interface/range", "{vCCCC..vNNNN}, meth@", 3, IndexType::Method)),
         0xfa => Some(("invoke-polymorphic", "{vC..vG}, meth@, proto@", 4, IndexType::Method)),
         0xfb => Some(("invoke-polymorphic/range", "{vCCCC..vNNNN}, meth@, proto@", 4, IndexType::Method)),
-        0xfc => Some(("invoke-custom", "{vC..vG}, call_site@", 3, IndexType::None)),
-        0xfd => Some(("invoke-custom/range", "{vCCCC..vNNNN}, call_site@", 3, IndexType::None)),
+        0xfc => Some(("invoke-custom", "{vC..vG}, call_site@", 3, IndexType::CallSite)),
+        0xfd => Some(("invoke-custom/range", "{vCCCC..vNNNN}, call_site@", 3, IndexType::CallSite)),
+
+        // Quicken/Internal invokes (API Level 1)
+        0xf8 => Some(("invoke-virtual-quick", "{vC..vG}, vtable_idx@", 3, IndexType::None)),
+        0xf9 => Some(("invoke-virtual-quick/range", "{vCCCC..vNNNN}, vtable_idx@", 3, IndexType::None)),
         _ => None,
     }
 }

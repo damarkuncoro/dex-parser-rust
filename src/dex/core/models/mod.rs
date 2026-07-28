@@ -20,7 +20,7 @@ pub use proto::Proto;
 pub use encoded_value::{EncodedValue, EncodedAnnotation, AnnotationElement};
 pub use annotation::{AnnotationsDirectory, AnnotationItem, FieldAnnotation, MethodAnnotation, ParameterAnnotation};
 pub use map_list::{MapList, MapItem};
-pub use apk::Apk;
+pub use apk::{Apk, Manifest};
 pub use analysis::AnalysisReport;
 
 use crate::dex::parsers::traits::{StringResolver, TypeResolver, MethodResolver, FieldResolver, DexResolver};
@@ -36,6 +36,8 @@ pub struct Dex<'a> {
     pub call_sites: Vec<raw::RawCallSiteIdItem>,
     pub byte_gaps: Vec<(usize, usize)>,
     pub analysis: AnalysisReport,
+    #[serde(skip)]
+    pub analysis_config: crate::analysis::core::config::AnalysisConfig,
 }
 
 #[derive(Serialize, Clone)]

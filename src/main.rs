@@ -2,54 +2,55 @@ mod cli;
 
 use crate::cli::{Cli, OutputFormat};
 use clap::Parser;
-use dex_parser_rust::dex::{
-    apk::ApkParser,
-    display::{json::JsonPrinter, text::DexDumpPrinter, DexPrinter},
-    DexParser,
-};
+use dex_parser_rust::apk::ApkHandler;
+use dex_parser_rust::exporter::{Exporter, JsonExporter, TextExporter, ExportOptions};
+use dex_parser_rust::analysis::core::config::{AnalysisConfig, CompiledConfig};
 use std::fs::File;
-use std::io::{Read, Write, ErrorKind};
+use std::io::Read;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
+    // 1. Load Configuration
+    let config = if let Some(config_path) = &args.config {
+        let mut file = File::open(config_path)?;
+        let mut content = String::new();
+        file.read_to_string(&mut content)?;
+        serde_json::from_str::<AnalysisConfig>(&content)?
+    } else {
+        AnalysisConfig::default()
+    };
+    let compiled_config = CompiledConfig::compile(config)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+
+    // 2. Load Input Buffer
     let mut file = File::open(&args.path)?;
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
 
-    let printer: Box<dyn DexPrinter> = match args.format {
-        OutputFormat::Json => Box::new(JsonPrinter),
-        OutputFormat::Text => Box::new(DexDumpPrinter),
+    let exporter: Box<dyn Exporter> = match args.format {
+        OutputFormat::Json => Box::new(JsonExporter),
+        OutputFormat::Text => Box::new(TextExporter),
     };
 
     let mut stdout = std::io::stdout().lock();
 
-    // Check if it's an APK (ZIP) or raw DEX
-    if buffer.starts_with(b"PK\x03\x04") {
-        let apk = ApkParser::parse_apk(&buffer)?;
-        for (i, dex) in apk.dex_files.iter().enumerate() {
-            if args.format == OutputFormat::Text {
-                if let Err(e) = writeln!(stdout, "\n--- DEX File #{} ---", i) {
-                    if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }
-                    return Err(e.into());
-                }
-            }
-            if let Err(e) = printer.print(dex, &format!("{} [DEX #{}]", args.path, i), &mut stdout) {
-                if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }
-                eprintln!("Error printing DEX #{}: {}", i, e);
-                return Err(e.into());
-            }
-        }
-    } else {
-        let dex = DexParser::parse(&buffer).map_err(|e| {
-            eprintln!("Error parsing {}: {}", args.path, e);
-            e
-        })?;
-        if let Err(e) = printer.print(&dex, &args.path, &mut stdout) {
-            if e.kind() == ErrorKind::BrokenPipe { return Ok(()); }
-            return Err(e.into());
-        }
-    }
+    // 3. Process with Config and Progress Feedback
+    let apk = ApkHandler::process_with_callback_and_config(
+        &buffer,
+        |msg| { eprintln!("  [>] {}", msg); },
+        compiled_config
+    )?;
+
+    eprintln!("  [+] Analysis complete. Exporting results...");
+
+    let options = ExportOptions {
+        include_instructions: !args.no_instructions,
+        include_analysis: !args.no_analysis,
+        include_metadata: args.include_metadata,
+    };
+
+    exporter.export_apk(&apk, &mut stdout, &options)?;
 
     Ok(())
 }

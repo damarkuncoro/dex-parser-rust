@@ -3,7 +3,7 @@ use super::method::EncodedMethod;
 use super::annotation::AnnotationsDirectory;
 use super::encoded_value::EncodedValue;
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct Class<'a> {
     pub class_idx: u32,
     pub name: String,
@@ -21,7 +21,7 @@ pub struct Class<'a> {
     pub static_values: Vec<EncodedValue<'a>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct EncodedField<'a> {
     pub name: String,
     pub type_name: String,
@@ -30,7 +30,7 @@ pub struct EncodedField<'a> {
     #[serde(skip)] pub _marker: std::marker::PhantomData<&'a ()>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct Code<'a> {
     pub registers_size: u16,
     pub ins_size: u16,
@@ -41,21 +41,21 @@ pub struct Code<'a> {
     pub debug_info: Option<DebugInfo<'a>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct CatchHandler<'a> {
     pub start_addr: u32,
     pub end_addr: u32,
     pub handlers: Vec<TryHandler<'a>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct TryHandler<'a> {
     pub type_name: String,
     pub addr: u32,
     #[serde(skip)] pub _marker: std::marker::PhantomData<&'a ()>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct Instruction {
     pub offset: usize,
     pub opcode: u8,
@@ -63,6 +63,8 @@ pub struct Instruction {
     pub description: String,
     pub index: Option<u32>,
     pub resolved_value: Option<String>,
+    pub registers: Vec<u16>,
+    pub target_offset: Option<u32>,
 }
 
 #[derive(Serialize, Clone, Debug)]

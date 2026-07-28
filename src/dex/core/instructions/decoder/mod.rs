@@ -40,9 +40,15 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
         let current_instr_byte_addr = pc - curr;
         let mut struct_index = None;
         let mut struct_resolved = None;
+        let mut registers = Vec::new();
+        let mut target_offset = None;
 
         if !units.is_empty() {
             let op_unit = units[0];
+
+            registers = helpers::extract_registers(&description, op_unit, &units);
+            target_offset = helpers::extract_branch_target(&description, op_unit, &units)
+                .map(|off| (current_instr_byte_addr as i32 + (off * 2)) as u32);
 
             helpers::substitute_special(&mut description, op_unit, &units);
             helpers::substitute_immediates(&mut description, op_unit, &units, buffer, pc, endian);
@@ -67,6 +73,8 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
             description,
             index: struct_index,
             resolved_value: struct_resolved,
+            registers,
+            target_offset,
         };
 
         (instruction, info.length * 2)

@@ -1,6 +1,6 @@
 use criterion::{black_box, Criterion};
 use dex_parser_rust::DexParser;
-use dex_parser_rust::dex::analysis::xref::XrefBuilder;
+use dex_parser_rust::dex::analysis::XrefBuilder;
 use std::fs;
 
 pub fn bench_analysis(c: &mut Criterion) {

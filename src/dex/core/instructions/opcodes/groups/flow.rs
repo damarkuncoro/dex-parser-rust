@@ -13,6 +13,7 @@ pub fn get(opcode: u8) -> Option<OpcodeData> {
         0x2a => Some(("goto/32", "+AAAAAAAA", 3, IndexType::None)),
         0x2b => Some(("packed-switch", "vAA, +BBBBBBBB", 3, IndexType::None)),
         0x2c => Some(("sparse-switch", "vAA, +BBBBBBBB", 3, IndexType::None)),
+        0x73 => Some(("return-void-no-barrier", "", 1, IndexType::None)),
         _ => None,
     }
 }

@@ -14,6 +14,8 @@ pub fn get(opcode: u8) -> Option<OpcodeData> {
         0x1a => Some(("const-string", "vAA, string@", 2, IndexType::String)),
         0x1b => Some(("const-string/jumbo", "vAAAA, string@", 3, IndexType::String)),
         0x1c => Some(("const-class", "vAA, type@", 2, IndexType::Type)),
+        0xfe => Some(("const-method-handle", "vAA, method_handle@", 2, IndexType::MethodHandle)),
+        0xff => Some(("const-method-type", "vAA, proto@", 2, IndexType::Proto)),
         _ => None,
     }
 }
