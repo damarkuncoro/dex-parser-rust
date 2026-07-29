@@ -62,5 +62,14 @@ pub fn export_header(dex: &Dex, writer: &mut dyn Write) -> std::io::Result<()> {
         "data_off            : {} (0x{:06x})",
         dex.header.data_off, dex.header.data_off
     )?;
+
+    writeln!(writer, "\nMap List:")?;
+    for item in &dex.map_list.items {
+        writeln!(
+            writer,
+            "  - Type: 0x{:04x}, Size: {}, Offset: 0x{:06x}",
+            item.item_type, item.size, item.offset
+        )?;
+    }
     Ok(())
 }

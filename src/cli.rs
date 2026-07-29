@@ -43,4 +43,6 @@ pub enum OutputFormat {
     Text,
     /// Machine-readable JSON output
     Json,
+    /// Interactive HTML Dashboard
+    Html,
 }

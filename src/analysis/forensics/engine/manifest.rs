@@ -1,39 +1,57 @@
 use crate::dex::core::models::Manifest;
 use crate::analysis::core::models::ScanResult;
+use crate::analysis::core::config::AnalysisConfig;
 
 pub struct ManifestAnalyzer;
 
 impl ManifestAnalyzer {
-    pub fn analyze(manifest: &Manifest) -> Vec<ScanResult> {
+    pub fn analyze(manifest: &Manifest, config: &AnalysisConfig) -> Vec<ScanResult> {
         let mut results = Vec::new();
 
-        // 1. Dangerous Permission Combinations
-        let has_sms_read = manifest.permissions.iter().any(|p| p.contains("READ_SMS"));
-        let has_sms_receive = manifest.permissions.iter().any(|p| p.contains("RECEIVE_SMS"));
-        let has_internet = manifest.permissions.iter().any(|p| p.contains("INTERNET"));
+        for rule in &config.manifest_rules {
+            let mut matched = true;
 
-        if (has_sms_read || has_sms_receive) && has_internet {
-            results.push(ScanResult {
-                category: "Manifest: Dangerous Combination".to_string(),
-                content: "SMS access combined with INTERNET (Potential Spyware/Exfiltration)".to_string(),
-            });
-        }
-
-        // 2. Sensitive Receivers
-        for receiver in &manifest.receivers {
-            if receiver.contains("BOOT_COMPLETED") || receiver.contains("RECEIVE_BOOT_COMPLETED") {
-                results.push(ScanResult {
-                    category: "Manifest: Persistence".to_string(),
-                    content: format!("Receiver starts at boot: {}", receiver),
-                });
+            // Check permissions
+            for perm in &rule.required_permissions {
+                if !manifest.permissions.iter().any(|p| p.contains(perm)) {
+                    matched = false;
+                    break;
+                }
             }
-        }
+            if !matched { continue; }
 
-        // 3. Hidden Components
-        if manifest.activities.is_empty() && !manifest.services.is_empty() {
-             results.push(ScanResult {
-                category: "Manifest: Stealth".to_string(),
-                content: "No activities found but services are present (Potential background malware)".to_string(),
+            // Check actions in intent filters
+            for action in &rule.required_actions {
+                let mut found_action = false;
+                let components = manifest.activities.iter()
+                    .chain(manifest.services.iter())
+                    .chain(manifest.receivers.iter());
+
+                for comp in components {
+                    for filter in &comp.intent_filters {
+                        if filter.actions.iter().any(|a| a.contains(action)) {
+                            found_action = true;
+                            break;
+                        }
+                    }
+                    if found_action { break; }
+                }
+                if !found_action {
+                    matched = false;
+                    break;
+                }
+            }
+            if !matched { continue; }
+
+            // Check stealth
+            if rule.must_have_no_activities && !manifest.activities.is_empty() {
+                continue;
+            }
+
+            results.push(ScanResult {
+                category: rule.category.clone(),
+                content: rule.description.clone(),
+                details: None,
             });
         }
 

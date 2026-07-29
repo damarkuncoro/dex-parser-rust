@@ -17,6 +17,7 @@ impl BehaviorScanner {
                 return Some(ScanResult {
                     category: format!("Behavior: {}", rule.category),
                     content: format!("{}: {}", rule.description, target),
+                    details: None,
                 });
             }
         }

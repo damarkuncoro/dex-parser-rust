@@ -84,6 +84,11 @@ impl ApkExtractor {
         }
 
         callback("Finalizing APK context...");
-        Ok(Apk::new_full(dex_files, dex_names, manifest, resources))
+        let mut apk = Apk::new_full(dex_files, dex_names.clone(), manifest, resources);
+
+        callback("Building global intelligence...");
+        apk.intelligence = crate::analysis::core::pipeline::AnalysisPipeline::build_apk_intelligence(&apk, &dex_names);
+
+        Ok(apk)
     }
 }

@@ -9,7 +9,6 @@ pub mod encoded_value;
 pub mod annotation;
 pub mod map_list;
 pub mod apk;
-pub mod analysis;
 pub mod wasm;
 
 pub use header::{RawHeader, ModernHeaderExt};
@@ -20,8 +19,8 @@ pub use proto::Proto;
 pub use encoded_value::{EncodedValue, EncodedAnnotation, AnnotationElement};
 pub use annotation::{AnnotationsDirectory, AnnotationItem, FieldAnnotation, MethodAnnotation, ParameterAnnotation};
 pub use map_list::{MapList, MapItem};
-pub use apk::{Apk, Manifest};
-pub use analysis::AnalysisReport;
+pub use apk::{Apk, Manifest, Component, IntentFilter};
+pub use crate::analysis::core::models::report::AnalysisReport;
 
 use crate::dex::parsers::traits::{StringResolver, TypeResolver, MethodResolver, FieldResolver, DexResolver};
 use serde::{Serialize};

@@ -3,7 +3,7 @@ use crate::dex::core::models::map_list::MapList;
 use crate::dex::readers::DexReader;
 use crate::dex::error::DexError;
 use crate::dex::validator::DexValidator;
-use crate::dex::parsers::core::{HeaderParser, map_list, MapProcessor};
+use crate::dex::parsers::core::{HeaderParser, MapProcessor};
 use crate::dex::parsers::core::map_processor::MapProcessorResults;
 use crate::dex::core::utils::byte_tracker::ByteTracker;
 use std::sync::Arc;
@@ -20,7 +20,7 @@ pub fn run(reader: &mut DexReader, buffer: &[u8], tracker: Arc<Mutex<ByteTracker
     let common_header = header_type.common();
 
     DexValidator::new().validate(buffer, &common_header)?;
-    let map_list = map_list::parse(buffer, common_header.map_off as usize, reader.endian())?;
+    let map_list = crate::dex::parsers::core::parse_map_list(buffer, common_header.map_off as usize, reader.endian())?;
 
     {
         let mut t = tracker.lock();

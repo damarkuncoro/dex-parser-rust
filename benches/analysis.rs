@@ -11,7 +11,7 @@ pub fn bench_analysis(c: &mut Criterion) {
 
     group.bench_function("xref_builder", |b| {
         b.iter(|| {
-            let xrefs = XrefBuilder::build(black_box(&dex));
+            let xrefs = XrefBuilder::build(black_box(&dex.class_defs));
             black_box(xrefs);
         })
     });

@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 use crate::analysis::core::utils::merge_hashmaps_with_vecs;
 
-#[derive(Serialize, Debug, Default, Clone)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct XrefMap {
     pub method_to_methods: HashMap<String, Vec<String>>,
     pub method_to_fields: HashMap<String, Vec<String>>,
@@ -24,4 +24,12 @@ impl XrefMap {
         for list in self.method_to_strings.values_mut() { list.sort(); list.dedup(); }
         for list in self.method_to_types.values_mut() { list.sort(); list.dedup(); }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct CallSite {
+    pub dex_name: String,
+    pub class_name: String,
+    pub method_name: String,
+    pub method_signature: String,
 }

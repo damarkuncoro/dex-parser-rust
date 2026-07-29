@@ -7,11 +7,12 @@ pub mod visitor;
 pub mod registry;
 pub mod pipeline;
 pub mod stats_visitor;
+pub mod scoring;
 
 pub use models::{
     AnalysisReport, AnalysisStats, GapAnalysis, ScanResult,
     BasicBlock, XrefMap, GlobalIntelligence, CallSite, GlobalSecuritySummary,
-    AnalysisToken
+    AnalysisToken, RiskAssessment, RiskLevel
 };
 pub use traits::{DexAnalyzer, ApkAnalyzer};
 pub use utils::{Reference, ReferenceExtractor};
@@ -21,3 +22,4 @@ pub use visitor::{InstructionVisitor, AnalysisEngine, VisitorContext};
 pub use registry::AnalysisRegistry;
 pub use pipeline::AnalysisPipeline;
 pub use stats_visitor::{StatsVisitor, InstructionStats};
+pub use scoring::ScoringEngine;

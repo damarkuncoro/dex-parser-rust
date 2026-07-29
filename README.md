@@ -20,6 +20,12 @@ A high-performance, modular, and parallel Android DEX/APK parsing engine written
 - **📝 Integrated Debug Info**: Inline support for `.line` and `.local` directives directly in the disassembly.
 - **📊 Structured Export**: Traditional **Text** output for human auditing and **JSON** for automated tool chains.
 - **🛡️ Robust Validation**: Rule-based engine to ensure file integrity (Magic, Checksum, Offsets, MapList).
+- **🕵️ Expert Security Analysis (New v1.6.0)**: 
+    - **Taint Analysis**: Inter-procedural data-flow tracking from sensitive Sources to network/SMS Sinks.
+    - **Crypto Dissection**: Automated unpacking of `Cipher` parameters (AES/RSA/DES) with risk assessment.
+    - **AOSP Opcode Compliance**: Detects `UNUSED` opcode violations and custom VM bytecode.
+    - **Binary Forensic Audit**: Automatic detection of "Hidden Payloads" and "Dead Code" (unreachable instructions).
+- **📈 Interactive HTML Dashboard**: High-fidelity reports with visual Call Graphs (via vis-network) and interactive anomaly charts.
 
 ---
 

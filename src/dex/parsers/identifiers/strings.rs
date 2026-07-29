@@ -28,6 +28,10 @@ impl StringSection {
             // Read the bytes including null terminator to mark them as used
             let bytes = reader.read_bytes(len + 1)?;
             strings.push(&bytes[..len]);
+
+            // Potential alignment: string_data_item doesn't have alignment in spec,
+            // but the Map List might point to items that are aligned.
+            // If the next string offset is more than current pos, there's a gap.
         }
         Ok(strings)
     }

@@ -22,10 +22,22 @@ pub struct Apk<'a> {
 pub struct Manifest {
     pub package_name: String,
     pub permissions: Vec<String>,
-    pub activities: Vec<String>,
-    pub services: Vec<String>,
-    pub receivers: Vec<String>,
-    pub providers: Vec<String>,
+    pub activities: Vec<Component>,
+    pub services: Vec<Component>,
+    pub receivers: Vec<Component>,
+    pub providers: Vec<Component>,
+}
+
+#[derive(Serialize, Default, Clone, Debug)]
+pub struct Component {
+    pub name: String,
+    pub intent_filters: Vec<IntentFilter>,
+}
+
+#[derive(Serialize, Default, Clone, Debug)]
+pub struct IntentFilter {
+    pub actions: Vec<String>,
+    pub categories: Vec<String>,
 }
 
 impl<'a> Apk<'a> {

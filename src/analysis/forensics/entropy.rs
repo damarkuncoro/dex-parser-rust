@@ -32,6 +32,14 @@ impl EntropyAnalyzer {
                 let end = (offset + length).min(buffer.len());
                 let data = &buffer[offset..end];
                 let entropy = Self::calculate(data);
+                let is_null_padded = data.iter().all(|&b| b == 0);
+
+                let data_preview = if data.len() <= 16 {
+                    data.iter().map(|b| format!("{:02x}", b)).collect::<Vec<_>>().join(" ")
+                } else {
+                    let hex: String = data[..8].iter().map(|b| format!("{:02x}", b)).collect::<Vec<_>>().join(" ");
+                    format!("{}...", hex)
+                };
 
                 GapAnalysis {
                     offset,
@@ -39,6 +47,8 @@ impl EntropyAnalyzer {
                     entropy,
                     is_suspicious: entropy > config.entropy_threshold
                                 && length > config.gap_length_threshold,
+                    is_null_padded,
+                    data_preview,
                 }
             })
             .collect()

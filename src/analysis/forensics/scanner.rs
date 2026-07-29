@@ -17,6 +17,7 @@ impl StringScanner {
                         local.push(ScanResult {
                             category: category.to_string(),
                             content: String::from_utf8_lossy(mat.as_bytes()).to_string(),
+                            details: None,
                         });
                     }
                 }
@@ -27,6 +28,7 @@ impl StringScanner {
                          local.push(ScanResult {
                             category: rule.category.clone(),
                             content: String::from_utf8_lossy(bytes).to_string(),
+                            details: None,
                         });
                     }
                 }
@@ -35,7 +37,8 @@ impl StringScanner {
                 if bytes.len() > compiled.config.forensics.suspicious_string_length {
                     local.push(ScanResult {
                         category: "Suspiciously Long String".to_string(),
-                        content: format!("Len: {} | Start: {}", bytes.len(), String::from_utf8_lossy(&bytes[..32.min(bytes.len())])),
+                        content: format!("Len: {} | Start: {}", bytes.len(), String::from_utf8_lossy(&bytes[..128.min(bytes.len())])),
+                        details: None,
                     });
                 }
 

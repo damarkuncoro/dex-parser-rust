@@ -27,49 +27,9 @@ impl TokenizerVisitor {
 impl InstructionVisitor for TokenizerVisitor {
     fn visit_instruction(&mut self, ctx: &VisitorContext) {
         if let Some(r) = &ctx.reference {
-            let token = match r {
-                Reference::Method(target) => {
-                    let scope = self.resolver.resolve(target);
-                    if scope == CodeScope::System {
-                        let mut found = None;
-                        for rule in &self.config.behavioral_rules {
-                            if target.contains(&rule.indicator) {
-                                found = match rule.category.as_str() {
-                                    "Crypto" => Some(AnalysisToken::CryptoOp(target.to_string())),
-                                    "Dynamic Loading" => Some(AnalysisToken::DynamicLoad),
-                                    "Reflection" => Some(AnalysisToken::Reflection),
-                                    "Native" => Some(AnalysisToken::NativeLoad(target.to_string())),
-                                    _ => None,
-                                };
-                                break;
-                            }
-                        }
-                        found.unwrap_or_else(|| AnalysisToken::ExternalCall(target.to_string()))
-                    } else {
-                        AnalysisToken::InternalCall(target.to_string())
-                    }
-                }
-                Reference::String(target) => {
-                    if is_shell_command(target, &self.config) {
-                        AnalysisToken::SystemCommand(target.to_string())
-                    } else if target.len() > 10 {
-                        AnalysisToken::StringUsage(target.to_string())
-                    } else {
-                        return;
-                    }
-                }
-                Reference::Type(target) => {
-                     let scope = self.resolver.resolve(target);
-                     if scope == CodeScope::System {
-                        AnalysisToken::ExternalCall(format!("Type:{}", target))
-                     } else {
-                        AnalysisToken::InternalCall(format!("Type:{}", target))
-                     }
-                }
-                _ => return,
-            };
-
-            self.results.entry(ctx.method.signature.clone()).or_default().push(token);
+            if let Some(token) = InstructionTokenizer::tokenize_reference(r, &self.config, &self.resolver) {
+                self.results.entry(ctx.method.signature.clone()).or_default().push(token);
+            }
         }
     }
 
@@ -124,45 +84,54 @@ impl InstructionTokenizer {
         instructions.iter()
             .filter_map(|ins| {
                 let reference = ReferenceExtractor::extract(ins);
-                reference.and_then(|r| {
-                    match r {
-                        Reference::Method(target) => {
-                            let scope = resolver.resolve(target);
-                            if scope == CodeScope::System {
-                                for rule in &config.behavioral_rules {
-                                    if target.contains(&rule.indicator) {
-                                        if rule.category == "Crypto" { return Some(AnalysisToken::CryptoOp(target.to_string())); }
-                                        if rule.category == "Dynamic Loading" { return Some(AnalysisToken::DynamicLoad); }
-                                        if rule.category == "Reflection" { return Some(AnalysisToken::Reflection); }
-                                        if rule.category == "Native" { return Some(AnalysisToken::NativeLoad(target.to_string())); }
-                                    }
-                                }
-                                Some(AnalysisToken::ExternalCall(target.to_string()))
-                            } else {
-                                Some(AnalysisToken::InternalCall(target.to_string()))
-                            }
-                        }
-                        Reference::String(target) => {
-                            if is_shell_command(target, config) {
-                                Some(AnalysisToken::SystemCommand(target.to_string()))
-                            } else if target.len() > 10 {
-                                Some(AnalysisToken::StringUsage(target.to_string()))
-                            } else {
-                                None
-                            }
-                        }
-                        Reference::Type(target) => {
-                            let scope = resolver.resolve(target);
-                            if scope == CodeScope::System {
-                                Some(AnalysisToken::ExternalCall(format!("Type:{}", target)))
-                            } else {
-                                Some(AnalysisToken::InternalCall(format!("Type:{}", target)))
-                            }
-                        }
-                        _ => None,
-                    }
-                })
+                reference.and_then(|r| Self::tokenize_reference(&r, config, resolver))
             })
             .collect()
+    }
+
+    pub fn tokenize_reference(
+        reference: &Reference,
+        config: &AnalysisConfig,
+        resolver: &NamespaceResolver
+    ) -> Option<AnalysisToken> {
+        match reference {
+            Reference::Method(target) => {
+                let scope = resolver.resolve(target);
+                if scope == CodeScope::System {
+                    for rule in &config.behavioral_rules {
+                        if target.contains(&rule.indicator) {
+                            match rule.category.as_str() {
+                                "Crypto" => return Some(AnalysisToken::CryptoOp(target.to_string())),
+                                "Dynamic Loading" => return Some(AnalysisToken::DynamicLoad),
+                                "Reflection" => return Some(AnalysisToken::Reflection),
+                                "Native" => return Some(AnalysisToken::NativeLoad(target.to_string())),
+                                _ => {}
+                            }
+                        }
+                    }
+                    Some(AnalysisToken::ExternalCall(target.to_string()))
+                } else {
+                    Some(AnalysisToken::InternalCall(target.to_string()))
+                }
+            }
+            Reference::String(target) => {
+                if is_shell_command(target, config) {
+                    Some(AnalysisToken::SystemCommand(target.to_string()))
+                } else if target.len() > 10 {
+                    Some(AnalysisToken::StringUsage(target.to_string()))
+                } else {
+                    None
+                }
+            }
+            Reference::Type(target) => {
+                let scope = resolver.resolve(target);
+                if scope == CodeScope::System {
+                    Some(AnalysisToken::ExternalCall(format!("Type:{}", target)))
+                } else {
+                    Some(AnalysisToken::InternalCall(format!("Type:{}", target)))
+                }
+            }
+            _ => None,
+        }
     }
 }

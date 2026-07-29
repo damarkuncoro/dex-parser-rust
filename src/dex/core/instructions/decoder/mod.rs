@@ -1,4 +1,4 @@
-use crate::dex::core::instructions::opcodes::{OpcodeTable};
+use crate::dex::core::instructions::opcodes::{OpcodeTable, groups};
 use crate::dex::core::models::Instruction;
 use crate::dex::parsers::traits::DexResolver;
 use scroll::{Endian, Pread};
@@ -30,12 +30,15 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
         let opcode_byte: u8 = buffer.pread_with(pc, endian).unwrap_or(0);
         let info = OpcodeTable::get(opcode_byte);
 
-        let mut description = info.format.clone();
         let mut units = Vec::new();
         for i in 0..info.length {
             let unit: u16 = buffer.pread_with(pc + (i * 2), endian).unwrap_or(0);
             units.push(unit);
         }
+
+        let mut description = groups::get_opcode_data(opcode_byte)
+            .map(|d| d.1.to_string())
+            .unwrap_or_else(|| "...".to_string());
 
         let current_instr_byte_addr = pc - curr;
         let mut struct_index = None;

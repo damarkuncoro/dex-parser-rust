@@ -28,6 +28,34 @@ impl Exporter for TextExporter {
         writeln!(writer, "APK Intelligence Report")?;
         writeln!(writer, "=======================")?;
 
+        // Find the most critical assessment among all DEX files
+        let max_assessment = apk.dex_files.iter()
+            .map(|d| &d.analysis.risk_assessment)
+            .max_by(|a, b| a.score.partial_cmp(&b.score).unwrap())
+            .cloned()
+            .unwrap_or_default();
+
+        writeln!(writer, "\n[Global Risk Assessment]")?;
+        writeln!(writer, "  Overall Score : {:.1} / 10.0", max_assessment.score)?;
+        writeln!(writer, "  Risk Level    : {:?}", max_assessment.level)?;
+
+        if !apk.intelligence.analysis_tags.is_empty() {
+            writeln!(writer, "\n[Intelligence Tags]")?;
+            for tag in &apk.intelligence.analysis_tags {
+                writeln!(writer, "  - {} ({:?})", tag.name, tag.severity)?;
+                writeln!(writer, "    Description : {}", tag.description)?;
+                if let Some(mitre) = &tag.mitre_id {
+                    writeln!(writer, "    MITRE ATT&CK: {}", mitre)?;
+                }
+            }
+        }
+        if !max_assessment.justifications.is_empty() {
+            writeln!(writer, "  Justifications:")?;
+            for j in &max_assessment.justifications {
+                writeln!(writer, "    - {}", j)?;
+            }
+        }
+
         if let Some(manifest) = &apk.manifest {
             writeln!(writer, "\n[Manifest Information]")?;
             writeln!(writer, "  Package Name: {}", manifest.package_name)?;

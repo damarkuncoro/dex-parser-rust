@@ -31,6 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let exporter: Box<dyn Exporter> = match args.format {
         OutputFormat::Json => Box::new(JsonExporter),
         OutputFormat::Text => Box::new(TextExporter),
+        OutputFormat::Html => Box::new(dex_parser_rust::exporter::html::HtmlExporter),
     };
 
     let mut stdout = std::io::stdout().lock();

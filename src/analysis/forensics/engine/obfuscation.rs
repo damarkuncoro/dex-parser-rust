@@ -15,7 +15,8 @@ impl ObfuscationVisitor {
         if name.len() > 128 {
             self.results.push(ScanResult {
                 category: "Obfuscation: Long Name".to_string(),
-                content: format!("{}: {} (Len: {})", context, &name[..32], name.len()),
+                content: format!("{}: {} (Len: {})", context, name, name.len()),
+                details: None,
             });
         }
 
@@ -24,6 +25,7 @@ impl ObfuscationVisitor {
             self.results.push(ScanResult {
                 category: "Obfuscation: Non-ASCII Identifier".to_string(),
                 content: format!("{}: {}", context, name),
+                details: None,
             });
         }
     }

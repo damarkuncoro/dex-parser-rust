@@ -9,7 +9,7 @@ pub mod tokens;
 pub use core::{
     AnalysisReport, AnalysisStats, GapAnalysis, ScanResult,
     BasicBlock, XrefMap, GlobalIntelligence, CallSite, GlobalSecuritySummary,
-    AnalysisToken
+    AnalysisToken, RiskAssessment, RiskLevel, ScoringEngine
 };
 
 // Modular Analyzers
@@ -22,7 +22,9 @@ pub use cross_ref::XrefBuilder;
 pub use cross_ref::builder::XrefVisitor;
 pub use forensics::{
     ForensicAnalyzer, EntropyAnalyzer, StringScanner,
-    BehaviorAnalyzer, BehaviorVisitor, ObfuscationVisitor, ResourceVisitor
+    BehaviorAnalyzer, BehaviorVisitor, ObfuscationVisitor, ResourceVisitor,
+    engine::data_flow::DataFlowVisitor,
+    engine::crypto::CryptoVisitor
 };
 pub use global::GlobalAnalyzer;
 pub use tokens::{InstructionTokenizer, TokenizerVisitor};
