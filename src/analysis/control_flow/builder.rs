@@ -1,7 +1,6 @@
 use crate::dex::core::models::Instruction;
 use crate::analysis::core::models::BasicBlock;
 use crate::analysis::core::traits::DexAnalyzer;
-use crate::analysis::core::config::OpcodeCategories;
 use std::collections::{HashSet, HashMap};
 
 pub struct CfgBuilder;
@@ -24,28 +23,18 @@ impl CfgBuilder {
         let mut leaders = HashSet::new();
         leaders.insert(0);
 
-        let offset_to_index: HashMap<usize, usize> = instructions.iter().enumerate()
-            .map(|(i, ins)| (ins.offset, i))
-            .collect();
+        let mut offset_to_index = HashMap::with_capacity(instructions.len());
+        for (i, ins) in instructions.iter().enumerate() {
+            offset_to_index.insert(ins.offset, i);
+        }
 
         for (i, ins) in instructions.iter().enumerate() {
             if let Some(target) = ins.target_offset {
                 leaders.insert(target as usize);
             }
 
-            if OpcodeCategories::is_branch(ins.opcode) || OpcodeCategories::is_goto(ins.opcode) {
-                if i + 1 < instructions.len() {
-                    leaders.insert(instructions[i + 1].offset);
-                }
-            }
-
-            if OpcodeCategories::is_switch(ins.opcode) {
-                if i + 1 < instructions.len() {
-                    leaders.insert(instructions[i + 1].offset);
-                }
-            }
-
-            if OpcodeCategories::is_terminator(ins.opcode) {
+            let op_info = crate::dex::core::instructions::opcodes::OpcodeTable::get(ins.opcode);
+            if op_info.can_branch || op_info.can_switch || !op_info.can_continue {
                 if i + 1 < instructions.len() {
                     leaders.insert(instructions[i + 1].offset);
                 }
@@ -53,29 +42,31 @@ impl CfgBuilder {
         }
 
         let mut sorted_leaders: Vec<usize> = leaders.into_iter().collect();
-        sorted_leaders.sort();
+        sorted_leaders.sort_unstable();
 
-        let mut blocks = Vec::new();
-        let mut offset_to_block_idx = HashMap::new();
+        let mut blocks = Vec::with_capacity(sorted_leaders.len());
+        let mut offset_to_block_idx = HashMap::with_capacity(sorted_leaders.len());
 
+        let mut ins_idx = 0;
         for i in 0..sorted_leaders.len() {
-            let start = sorted_leaders[i];
-            let end = if i + 1 < sorted_leaders.len() {
+            let start_offset = sorted_leaders[i];
+            let end_offset = if i + 1 < sorted_leaders.len() {
                 sorted_leaders[i + 1]
             } else {
-                instructions.last().map(|n| n.offset + 2).unwrap_or(start)
+                instructions.last().map(|n| n.offset + 2).unwrap_or(start_offset + 2)
             };
 
-            let block_ins: Vec<usize> = instructions.iter()
-                .filter(|ins| ins.offset >= start && ins.offset < end)
-                .map(|ins| ins.offset)
-                .collect();
+            let mut block_ins = Vec::new();
+            while ins_idx < instructions.len() && instructions[ins_idx].offset < end_offset {
+                block_ins.push(instructions[ins_idx].offset);
+                ins_idx += 1;
+            }
 
             if !block_ins.is_empty() {
-                offset_to_block_idx.insert(start, blocks.len());
+                offset_to_block_idx.insert(start_offset, blocks.len());
                 blocks.push(BasicBlock {
-                    start_offset: start,
-                    end_offset: end,
+                    start_offset,
+                    end_offset,
                     instructions: block_ins,
                     successors: Vec::new(),
                 });
@@ -88,23 +79,17 @@ impl CfgBuilder {
             let last_ins = &instructions[last_ins_idx];
 
             let mut successors = Vec::new();
+            let op_info = crate::dex::core::instructions::opcodes::OpcodeTable::get(last_ins.opcode);
 
-            if OpcodeCategories::is_goto(last_ins.opcode) {
+            if op_info.can_branch {
                 if let Some(target) = last_ins.target_offset {
                     if let Some(&target_block_idx) = offset_to_block_idx.get(&(target as usize)) {
                         successors.push(target_block_idx);
                     }
                 }
-            } else if OpcodeCategories::is_branch(last_ins.opcode) {
-                if let Some(target) = last_ins.target_offset {
-                    if let Some(&target_block_idx) = offset_to_block_idx.get(&(target as usize)) {
-                        successors.push(target_block_idx);
-                    }
-                }
-                if i + 1 < blocks.len() {
-                    successors.push(i + 1);
-                }
-            } else if !OpcodeCategories::is_terminator(last_ins.opcode) {
+            }
+
+            if op_info.can_continue {
                 if i + 1 < blocks.len() {
                     successors.push(i + 1);
                 }
@@ -114,5 +99,36 @@ impl CfgBuilder {
         }
 
         blocks
+    }
+
+    pub fn get_reachable_offsets(instructions: &[Instruction]) -> Vec<bool> {
+        let n = instructions.len();
+        if n == 0 { return Vec::new(); }
+
+        let mut reachable = vec![false; n];
+        let mut stack = Vec::with_capacity(n);
+        stack.push(0);
+
+        while let Some(idx) = stack.pop() {
+            if reachable[idx] { continue; }
+            reachable[idx] = true;
+
+            let ins = &instructions[idx];
+            let op_info = crate::dex::core::instructions::opcodes::OpcodeTable::get(ins.opcode);
+
+            if op_info.can_continue && idx + 1 < n {
+                stack.push(idx + 1);
+            }
+
+            if op_info.can_branch {
+                if let Some(target) = ins.target_offset {
+                    if let Ok(target_idx) = instructions.binary_search_by_key(&target, |i| i.offset as u32) {
+                        stack.push(target_idx);
+                    }
+                }
+            }
+        }
+
+        reachable
     }
 }

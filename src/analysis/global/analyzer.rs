@@ -1,9 +1,9 @@
 use crate::dex::core::models::Apk;
 use crate::analysis::core::traits::ApkAnalyzer;
-use crate::analysis::core::utils::{Reference, ReferenceExtractor};
 use crate::analysis::core::models::{GlobalIntelligence, CallSite};
 use crate::analysis::forensics::engine::ManifestAnalyzer;
 use crate::analysis::global::intelligence::IntelligenceEngine;
+use std::collections::{HashMap, HashSet};
 use rayon::prelude::*;
 
 pub struct GlobalAnalyzer;
@@ -37,7 +37,7 @@ impl ApkAnalyzer for GlobalAnalyzer {
         intel.deduplicate();
 
         // 4. Optimization for UI: Filter XREFs to only show interesting ones
-        let sensitive_methods: std::collections::HashSet<String> = intel.behavioral_indicators.iter()
+        let sensitive_methods: HashSet<String> = intel.behavioral_indicators.iter()
             .map(|i| i.content.clone())
             .collect();
 
@@ -63,47 +63,33 @@ impl GlobalIntelligence {
                 local_intel.global_security_summary.total_dead_code = dex.analysis.stats.dead_code_count;
                 local_intel.global_security_summary.potentially_packed = dex.analysis.stats.suspicious_gap_count > 0;
 
-                // 1. Pull already analyzed behavioral indicators (Taint, Crypto, etc.)
                 local_intel.behavioral_indicators.extend(dex.analysis.sensitive_indicators.clone());
 
-                // 2. Build Cross-DEX references
-                for class in &dex.class_defs {
-                    let all_methods = class.direct_methods.iter().chain(class.virtual_methods.iter());
-                    for method in all_methods {
-                        if let Some(code) = &method.code {
-                            let site = CallSite {
-                                dex_name: current_dex_name.clone(),
-                                class_name: class.name.clone(),
-                                method_name: method.name.clone(),
-                                method_signature: method.signature.clone(),
-                            };
+                let helper = |target_map: &mut HashMap<String, Vec<CallSite>>, source_map: &HashMap<String, Vec<String>>| {
+                    for (caller_sig, targets) in source_map {
+                        // Minimal parsing of signature
+                        let class_name = caller_sig.split("->").next().unwrap_or(caller_sig).to_string();
+                        let method_part = caller_sig.split("->").nth(1).unwrap_or("");
+                        let method_name = method_part.split('(').next().unwrap_or(method_part).to_string();
 
-                            for ins in &code.instructions {
-                                if let Some(reference) = ReferenceExtractor::extract(ins) {
-                                    match reference {
-                                        Reference::Method(target) => {
-                                            local_intel.cross_dex_calls.entry(target.to_string())
-                                                .or_default().push(site.clone());
-                                        }
-                                        Reference::Field(target) => {
-                                            local_intel.cross_dex_fields.entry(target.to_string())
-                                                .or_default().push(site.clone());
-                                        }
-                                        Reference::String(target) => {
-                                            local_intel.cross_dex_strings.entry(target.to_string())
-                                                .or_default().push(site.clone());
-                                        }
-                                        Reference::Type(target) => {
-                                            local_intel.cross_dex_types.entry(target.to_string())
-                                                .or_default().push(site.clone());
-                                        }
-                                        _ => {}
-                                    }
-                                }
-                            }
+                        let site = CallSite {
+                            dex_name: current_dex_name.clone(),
+                            class_name,
+                            method_name,
+                            method_signature: caller_sig.clone(),
+                        };
+
+                        for target in targets {
+                            target_map.entry(target.clone()).or_default().push(site.clone());
                         }
                     }
-                }
+                };
+
+                helper(&mut local_intel.cross_dex_calls, &dex.analysis.xrefs.method_to_methods);
+                helper(&mut local_intel.cross_dex_fields, &dex.analysis.xrefs.method_to_fields);
+                helper(&mut local_intel.cross_dex_strings, &dex.analysis.xrefs.method_to_strings);
+                helper(&mut local_intel.cross_dex_types, &dex.analysis.xrefs.method_to_types);
+
                 local_intel
             })
             .reduce(Self::default, |mut a, b| {

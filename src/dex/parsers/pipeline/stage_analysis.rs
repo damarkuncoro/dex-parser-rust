@@ -126,7 +126,34 @@ pub fn run(
         })
         .sum::<usize>();
 
-    // 5. Create the final report
+    // 5. Parallel Dead Code Analysis (Optimized)
+    let (total_dead_code, dead_opcodes_map) = classes.par_iter()
+        .map(|class| {
+            let mut dead_count = 0;
+            let mut local_map = std::collections::HashMap::new();
+
+            for method in class.direct_methods.iter().chain(class.virtual_methods.iter()) {
+                if let Some(code) = &method.code {
+                    let reachable = CfgBuilder::get_reachable_offsets(&code.instructions);
+                    for (idx, ins) in code.instructions.iter().enumerate() {
+                        if !reachable[idx] {
+                            dead_count += 1;
+                            *local_map.entry(ins.opcode).or_insert(0) += 1;
+                        }
+                    }
+                }
+            }
+            (dead_count, local_map)
+        })
+        .reduce(|| (0, std::collections::HashMap::new()), |mut acc, (count, map)| {
+            acc.0 += count;
+            for (op, c) in map {
+                *acc.1.entry(op).or_insert(0) += c;
+            }
+            acc
+        });
+
+    // 6. Create the final report
     let mut report = AnalysisReport::new(
         forensic_data.0,
         final_indicators,
@@ -136,24 +163,6 @@ pub fn run(
     );
     report.potential_resource_ids = potential_resource_ids;
 
-    let mut total_dead_code = 0;
-    for class in classes {
-        for method in class.direct_methods.iter().chain(class.virtual_methods.iter()) {
-            if let Some(code) = &method.code {
-                let cfg = CfgBuilder::build(&code.instructions);
-                let reachable_offsets: std::collections::HashSet<usize> = cfg.iter()
-                    .flat_map(|b| b.instructions.clone())
-                    .collect();
-
-                for (idx, _) in code.instructions.iter().enumerate() {
-                    if !reachable_offsets.contains(&idx) {
-                        total_dead_code += 1;
-                    }
-                }
-            }
-        }
-    }
-
     report.stats.call_count = stats.call_count;
     report.stats.jump_count = stats.jump_count;
     report.stats.string_count = stats.string_count;
@@ -162,6 +171,7 @@ pub fn run(
     report.stats.unknown_opcodes_distribution = stats.unknown_opcodes_distribution;
     report.stats.max_consecutive_nops = stats.max_consecutive_nops;
     report.stats.dead_code_count = total_dead_code;
+    report.stats.dead_code_opcodes = dead_opcodes_map;
 
     // 6. Final Risk Assessment
     report.risk_assessment = ScoringEngine::assess(&report, &compiled_config.config);

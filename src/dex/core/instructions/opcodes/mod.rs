@@ -155,7 +155,7 @@ fn is_unused_in_dalvik_spec(op: u8) -> bool {
 pub struct OpcodeTable;
 
 impl OpcodeTable {
-    pub fn get(opcode: u8) -> OpcodeInfo {
-        OPCODE_TABLE[opcode as usize].clone()
+    pub fn get(opcode: u8) -> &'static OpcodeInfo {
+        &OPCODE_TABLE[opcode as usize]
     }
 }

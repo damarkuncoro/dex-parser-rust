@@ -17,7 +17,7 @@ impl CryptoVisitor {
         }
     }
 
-    fn analyze_transformation(&self, transformation: &str) -> CryptoDetails {
+    fn analyze_transformation(&self, transformation: &str, key_used: Option<String>) -> CryptoDetails {
         let parts: Vec<&str> = transformation.split('/').collect();
         let algo = parts.get(0).unwrap_or(&"Unknown").to_string();
         let mode = parts.get(1).unwrap_or(&"None").to_string();
@@ -35,6 +35,11 @@ impl CryptoVisitor {
         } else if padding == "NoPadding" && mode == "CBC" {
             risk = "MEDIUM";
             reason = "Using NoPadding with CBC can be risky if not handled carefully.".to_string();
+        }
+
+        if key_used.is_some() {
+            reason += " (Hardcoded key detected!)";
+            risk = "CRITICAL";
         }
 
         CryptoDetails {
@@ -60,7 +65,19 @@ impl InstructionVisitor for CryptoVisitor {
             }
         }
 
-        // 2. Detect Cipher.getInstance
+        // 2. Detect SecretKeySpec initialization
+        let mut found_key = None;
+        if let Some(Reference::Method(target)) = &ctx.reference {
+            if target.contains("SecretKeySpec;-><init>") {
+                 if let Some(arg_reg) = regs.get(0) {
+                     if let Some(k) = strings.get(arg_reg) {
+                         found_key = Some(k.clone());
+                     }
+                 }
+            }
+        }
+
+        // 3. Detect Cipher.getInstance
         let mut found_transformation = None;
         if let Some(Reference::Method(target)) = &ctx.reference {
             if target.contains("Ljavax/crypto/Cipher;->getInstance") {
@@ -73,16 +90,13 @@ impl InstructionVisitor for CryptoVisitor {
         }
 
         if let Some(transformation) = found_transformation {
-            let details = self.analyze_transformation(&transformation);
+            let details = self.analyze_transformation(&transformation, found_key);
             self.findings.push(ScanResult {
                 category: "Cryptography".to_string(),
                 content: format!("Algorithm: {}", transformation),
                 details: Some(details),
             });
         }
-
-        // 3. Clear registers on write (if not handled by tracking above)
-        // For simplicity in this version, we only track direct const-string loads.
     }
 
     fn merge(&mut self, other: Box<dyn InstructionVisitor>) {

@@ -14,8 +14,14 @@ impl BehaviorScanner {
 
         for rule in &config.behavioral_rules {
             if target.contains(&rule.indicator) {
+                let category = if let Some(perm) = &rule.required_permission {
+                    format!("Behavior: {} (Requires {})", rule.category, perm)
+                } else {
+                    format!("Behavior: {}", rule.category)
+                };
+
                 return Some(ScanResult {
-                    category: format!("Behavior: {}", rule.category),
+                    category,
                     content: format!("{}: {}", rule.description, target),
                     details: None,
                 });

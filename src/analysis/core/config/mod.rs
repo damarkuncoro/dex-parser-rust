@@ -45,25 +45,36 @@ impl Default for AnalysisConfig {
                     category: "Dynamic Loading".to_string(),
                     indicator: "Ldalvik/system/DexClassLoader;".to_string(),
                     description: "Loading external DEX".to_string(),
-                    mitre_id: Some("T1071".to_string())
+                    mitre_id: Some("T1071".to_string()),
+                    required_permission: None
                 },
                 CustomBehavioralRule {
                     category: "Reflection".to_string(),
                     indicator: "Ljava/lang/reflect/Method;->invoke".to_string(),
                     description: "Method reflection".to_string(),
-                    mitre_id: Some("T1129".to_string())
+                    mitre_id: Some("T1129".to_string()),
+                    required_permission: None
                 },
                 CustomBehavioralRule {
                     category: "Crypto".to_string(),
                     indicator: "Ljavax/crypto/Cipher;".to_string(),
                     description: "Cryptography usage".to_string(),
-                    mitre_id: Some("T1573".to_string())
+                    mitre_id: Some("T1573".to_string()),
+                    required_permission: None
+                },
+                CustomBehavioralRule {
+                    category: "Sms".to_string(),
+                    indicator: "Landroid/telephony/SmsManager;->sendTextMessage".to_string(),
+                    description: "Sending SMS".to_string(),
+                    mitre_id: Some("T1589".to_string()),
+                    required_permission: Some("SEND_SMS".to_string())
                 },
                 CustomBehavioralRule {
                     category: "Native".to_string(),
                     indicator: "Ljava/lang/System;->loadLibrary".to_string(),
                     description: "Loading native libraries".to_string(),
-                    mitre_id: Some("T1129".to_string())
+                    mitre_id: Some("T1129".to_string()),
+                    required_permission: None
                 },
             ],
             sensitive_heuristics: vec![

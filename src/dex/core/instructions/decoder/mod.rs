@@ -74,7 +74,7 @@ impl<'res, 'a, R: DexResolver<'a>> InstructionDecoder<'res, 'a, R> {
         let instruction = Instruction {
             offset: current_instr_byte_addr,
             opcode: opcode_byte,
-            name: info.name,
+            name: info.name.clone(),
             description,
             index: struct_index,
             resolved_value: struct_resolved,

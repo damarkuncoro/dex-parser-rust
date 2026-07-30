@@ -40,6 +40,7 @@ pub struct CustomBehavioralRule {
     pub indicator: String,
     pub description: String,
     pub mitre_id: Option<String>,
+    pub required_permission: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

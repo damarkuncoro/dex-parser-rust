@@ -42,6 +42,16 @@ pub fn export_analysis(dex: &Dex, writer: &mut dyn Write) -> std::io::Result<()>
 
     if report.stats.dead_code_count > 0 {
         writeln!(writer, "  - Dead Code: {} unreachable instructions (⚠ Potentially hidden/junk code)", report.stats.dead_code_count)?;
+        let mut sorted_dead: Vec<_> = report.stats.dead_code_opcodes.iter().collect();
+        sorted_dead.sort_by(|a, b| b.1.cmp(a.1));
+
+        write!(writer, "    [!] Top dead opcodes: ")?;
+        for (i, (op, count)) in sorted_dead.iter().take(5).enumerate() {
+            let op_name = &crate::dex::core::instructions::opcodes::OpcodeTable::get(**op).name;
+            if i > 0 { write!(writer, ", ")?; }
+            write!(writer, "{} (0x{:02x}: {})", op_name, op, count)?;
+        }
+        writeln!(writer)?;
     }
 
     writeln!(writer, "  - Alignment Padding: {} bytes", alignment_bytes)?;
